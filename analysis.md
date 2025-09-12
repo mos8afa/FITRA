@@ -1,32 +1,42 @@
 Home:
     - logo
     - slogen
-    - brief
+    - perfect bodies
+
+    - brief title
+    - brief content
     - brief image
+
     - about us
     - about us image
+
     - footer image
+    - footer slogen
+
     - youtube
     - whatsapp
     - facebook
     - instagram
     - tiktok
     - telegram
+______________________________________________________
 
 Successful Stories:
     - before image
     - after image
     - name
-    - time
+______________________________________________________
 
 Packadges:
     - title
     - before price
     - after price
     - time
-    - advantaes
+    - advantages
     - dis advantages
-    
+    - image
+______________________________________________________
+
 member:
     - name
     - age

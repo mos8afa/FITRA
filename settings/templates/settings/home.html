@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITRA | Online Coaching</title>
+    <link rel="icon" type="image/png" href="{% static 'img/logo-H.png' %}">
+
+    <!-- icon -->
+    
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+
+<!-- icon -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Merienda:wght@300..900&family=Permanent+Marker&display=swap" rel="stylesheet">
+</head>
+<body>
+    
+    <!-- عنصر الخلفية الضبابية -->
+    <div id="overlay"></div>
+    <!-- عنصر الإعلان المخفي -->
+    <!-- <div id="ad">
+        <span id="close-btn">X</span>
+        <a href="../Perfume Website/index.html" target="_blank">
+            <img src="img/ad.png" alt="ad">
+        </a>
+    </div> -->
+
+    <header>
+        <div class="container">
+            <a href="" class="logo">
+                <img src="{{info.logo.url}}" alt="logo">
+            </a>
+            <nav>
+                <i class="fas fa-bars toggle-menu"></i>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#Packages">Packages <i class="bi bi-cart3"></i></a></li>
+                    <li><a href="#Contact">Contact US</a></li>
+                    <li><a class="active" href="#Packages">Become a Member</a></li>
+                    <li><a href="index2.html">العربيه</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="landing">
+        <div class="overlay">
+
+        </div>
+        <div class="content">
+            <h2>{{info.slogan}}</h2>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="main animation-3d-container">
+                <div class="animated-card animation-3d-card">
+                    <div class="goku animation-3d-goku">
+                        <img src="{{brief.brief_image.url}}" alt="Animated Person" class="animation-3d-img">
+                    </div>
+                </div>
+            </div>
+            <div class="prag">
+                <h1>{{brief.brief_title}}</h1>
+                <h2>{{brief.brief_content|safe}}</h2>
+            </div>
+        </div>
+    </main>
+
+    <section>
+        <div class="container">
+            <div class="about">
+                <h2>
+                    About <br>
+                    <span>US</span>
+                </h2>
+                <p>{{about_us.about_us_content|safe}}</p>
+            </div>
+            <div class="section">
+                <img src="{{about_us.about_us_image.url}}" alt="">
+            </div>
+            <div class="extra">
+                <div>
+                    <i class="fa-regular fa-clock"></i>
+                    <p>24</p>
+                    <span> Working Hours</span>
+                </div>
+                <div>
+                    <i class="fa-solid fa-users icon"></i>
+                    <p id="followersCount">509</p>
+                    <a href="{{social_links.instagram}}"> Followers</a>
+                </div>
+                <div>
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <p>45</p>
+                    <a href="{{social_links.instagram_page}}">Successful Stories</a>
+                </div>
+                <div>
+                    <i class="fa-solid fa-dna"></i>
+                    <p>5</p>
+                    <a href="{{social_links.instagram_page}}">Perfect Bodies</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <aside id="Packages">
+        <div class="container">
+            <div class="arrow">
+                <i class="fas fa-angle-down fa-2x"></i>
+            </div>
+            
+            <!-- New Successful Stories Section -->
+            <div class="success-stories">
+                <div class="stories-header">
+                    <h2>Successful Stories</h2>
+                    <h3>FITRA Results</h3>
+                </div>
+                <div class="stories-container fade-in">
+                    <!-- Navigation Arrows -->
+                    <div class="stories-nav">
+                        <i class="fas fa-angle-left change-background fa-2x" id="prev-btn"></i>
+                        <i class="fas fa-angle-right change-background fa-2x" id="next-btn"></i>
+                    </div>
+                {% for story in successful_stories %}
+                    <!-- Story 1 -->
+                    <div class="story-transformation-card">
+                        <img src="{% static './img/logo-T.png' %}" alt="Logo" draggable="false" class="story-logo">
+                        <div class="story-photos-container">
+                            <div class="story-photo-comparison">
+                                <img src="{{story.before_image.url}}" alt="before" draggable="false" class="img-before before">
+                                <div class="img-after-container">
+                                    <img src="{{story.after_image.url}}" alt="after" draggable="false" class="img-after after">
+                                </div>
+                                <div class="divider-handle"></div>
+                            </div>
+                        </div>
+                        <div class="story-branding">{{Story.name}}</div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+
+            <h1>Our Plans</h1>
+            <h2>CHOOSE YOUR PLAN</h2>
+            <div class="plans">
+            {% for pack in packadges %}
+                <div class="card">
+                    <div>
+                        <h1>{{pack.name}}</h1>
+                        <article>
+                            <del>{{pack.before_price}}LE</del>
+                            <h3>{{pack.after_price}} LE</h3>
+                        </article>
+                        <p>{{pack.time}}</p>
+                        <span class="btn">
+                            <a href="https://forms.gle/wTqGzTY2gveHoTaC8">Join Now</a>
+                        </span>
+                        <ul>
+                        {% for advantage in pack.advantages.all  %}
+                            <li><i class="bi bi-check-lg"></i>{{advantage.advantages|safe}}</li>
+                        {% endfor %}    
+                        {% for disadvantage in pack.disadvantages.all %}
+                            <li><i class="fas fa-times red"></i>{{disadvantage.disadvantages|safe}}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+            </div> 
+        </div>
+    </aside>
+
+    <div class="quot">
+        <canvas id="glow-bg"></canvas>
+        <div class="container fade-in">
+            <q>
+                {{footer_slogan}} 
+                <span class="broken" data-text="BROKEN"><span>{{broken_word}}</span></span>
+                {{footer_slogan_2}}
+            </q>
+        </div>
+    </div>
+
+    <footer id="Contact">
+        <div class="container fade-in">
+            <div class="footer_1 fade-in">
+                <h3>FITRA</h3>
+                <p>Feel free to be a part of our family.</p>
+            </div>
+            <div class="footer_2 fade-in">
+                <h3 class="dynamic-word">
+                    <span>C</span>
+                    <span>O</span>
+                    <span>N</span>
+                    <span>N</span>
+                    <span>E</span>
+                    <span>C</span>
+                    <span>T</span>
+                    <span>I</span>
+                    <span>O</span>
+                    <span>N</span>
+                </h3>
+
+                <!-- <i class="bi bi-arrow-bar-down"></i> -->
+                <div class="rack">
+                    <!-- الدعم الخلفي -->
+                    <div class="support_1"></div>
+                    <div class="support_2"></div>
+                    <!-- القاعدة الأرضية -->
+                    <div class="base"></div>
+
+                    <!-- بار أول -->
+                    <div class="bar bar-1">
+                        <a href="{{social_links.youtube}}" class="holder youtube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="{{social_links.facebook}}" class="holder facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </div>
+                    <!-- بار ثاني -->
+                    <div class="bar bar-2">
+                        <a href="{{social_links.whatsapp}}" class="holder whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="{{social_links.instagram}}" class="holder instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <!-- بار ثالث -->
+                    <div class="bar bar-3">
+                        <a href="{{social_links.telegram}}" class="holder telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                        <a href="{{social_links.tiktok}}" class="holder tiktok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- <hr> -->
+        <p class="farouk">
+            Copyright © 2025 All rights reserved | Made  by  <a href="https://t.me/Roka_31">Farouk</a>
+        </p>
+    </footer>
+
+
+</body>
+<script src="{% static 'js/1.js' %}"></script>
+<script src="{% static 'js/animations.js' %}"></script>
+<script src="{% static 'js/instagram-api.js' %}"></script>
+</html>
+<script src="{% static 'js/instagram-api.js' %}"></script>
+</html>
