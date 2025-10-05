@@ -1,29 +1,44 @@
 {% load static %}
+{% load i18n %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
+
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FITRA | Online Coaching</title>
     <link rel="icon" type="image/png" href="{% static 'img/logo-H.png' %}">
 
-    <!-- icon -->
-    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
 
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-<link rel="stylesheet" href="{% static 'css/normalize.css' %}">
-<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    {% if LANGUAGE_CODE == 'ar' %}
+        <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+    {% else %}
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% endif %}
 
-<!-- icon -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<!-- Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Merienda:wght@300..900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- English Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Merienda:wght@300..900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <!-- Arabic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
 </head>
+
+
 <body>
     
     <!-- عنصر الخلفية الضبابية -->
@@ -37,22 +52,49 @@
     </div> -->
 
     <header>
-        <div class="container">
-            <a href="" class="logo">
-                <img src="{{info.logo.url}}" alt="logo">
-            </a>
-            <nav>
-                <i class="fas fa-bars toggle-menu"></i>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="#Packages">Packages <i class="bi bi-cart3"></i></a></li>
-                    <li><a href="#Contact">Contact US</a></li>
-                    <li><a class="active" href="#Packages">Become a Member</a></li>
-                    <li><a href="index2.html">العربيه</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div class="container">
+        <a href="" class="logo">
+            <img src="{{info.logo.url}}" alt="logo">
+        </a>
+        <nav>
+            <i class="fas fa-bars toggle-menu"></i>
+            <ul>
+                <li><a href="/">{% translate "Home" %}</a></li>
+                <li><a href="#Packages">{% translate "Packages" %} <i class="bi bi-cart3"></i></a></li>
+                <li><a href="#Contact">{% translate "Contact US" %}</a></li>
+                <li><a class="active" href="#Packages">{% translate "Become a Member" %}</a></li>
+
+                {% get_current_language as LANGUAGE_CODE %}
+
+                {% if LANGUAGE_CODE == "en" %}
+                    <li>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('lang-ar').submit();">
+                            العربية
+                        </a>
+                        <form id="lang-ar" action="{% url 'set_language' %}" method="post" style="display:none;">
+                            {% csrf_token %}
+                            <input type="hidden" name="language" value="ar">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                        </form>
+                    </li>
+                {% elif LANGUAGE_CODE == "ar" %}
+                    <li>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('lang-en').submit();">
+                            English
+                        </a>
+                        <form id="lang-en" action="{% url 'set_language' %}" method="post" style="display:none;">
+                            {% csrf_token %}
+                            <input type="hidden" name="language" value="en">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                        </form>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
 
     <div class="landing">
         <div class="overlay">
@@ -83,8 +125,8 @@
         <div class="container">
             <div class="about">
                 <h2>
-                    About <br>
-                    <span>US</span>
+                    {% translate "About" %} <br>
+                    <span>{% translate "US" %}</span>
                 </h2>
                 <p>{{about_us.about_us_content|safe}}</p>
             </div>
@@ -125,7 +167,7 @@
             <!-- New Successful Stories Section -->
             <div class="success-stories">
                 <div class="stories-header">
-                    <h2>Successful Stories</h2>
+                    <h2>{% translate "Successful Stories" %}</h2>
                     <h3>FITRA Results</h3>
                 </div>
                 <div class="stories-container fade-in">
@@ -135,7 +177,6 @@
                         <i class="fas fa-angle-right change-background fa-2x" id="next-btn"></i>
                     </div>
                 {% for story in successful_stories %}
-                    <!-- Story 1 -->
                     <div class="story-transformation-card">
                         <img src="{% static './img/logo-T.png' %}" alt="Logo" draggable="false" class="story-logo">
                         <div class="story-photos-container">
@@ -147,14 +188,14 @@
                                 <div class="divider-handle"></div>
                             </div>
                         </div>
-                        <div class="story-branding">{{Story.name}}</div>
+                        <div class="story-branding">{{story.name}}</div>
                     </div>
                 {% endfor %}
                 </div>
             </div>
 
-            <h1>Our Plans</h1>
-            <h2>CHOOSE YOUR PLAN</h2>
+            <h1>{% translate "Our Plans" %}</h1>
+            <h2>{% translate "CHOOSE YOUR PLAN" %}</h2>
             <div class="plans">
             {% for pack in packadges %}
                 <div class="card">
@@ -166,7 +207,7 @@
                         </article>
                         <p>{{pack.time}}</p>
                         <span class="btn">
-                            <a href="https://forms.gle/wTqGzTY2gveHoTaC8">Join Now</a>
+                            <a href="https://forms.gle/wTqGzTY2gveHoTaC8">{% translate "Join Now" %}</a>
                         </span>
                         <ul>
                         {% for advantage in pack.advantages.all  %}
@@ -198,7 +239,7 @@
         <div class="container fade-in">
             <div class="footer_1 fade-in">
                 <h3>FITRA</h3>
-                <p>Feel free to be a part of our family.</p>
+                <p>{% translate "Feel free to be a part of our family." %}</p>
             </div>
             <div class="footer_2 fade-in">
                 <h3 class="dynamic-word">
@@ -213,6 +254,7 @@
                     <span>O</span>
                     <span>N</span>
                 </h3>
+                
 
                 <!-- <i class="bi bi-arrow-bar-down"></i> -->
                 <div class="rack">
@@ -255,8 +297,18 @@
         </div>
         <!-- <hr> -->
         <p class="farouk">
-            Copyright © 2025 All rights reserved | Made  by  <a href="https://t.me/Roka_31">Farouk</a>
+            Copyright © 2025 All rights reserved | Made by  
+            <span class="frontend">
+                Front-End:
+                <a href="https://t.me/Roka_31"> Farouk</a>
+            </span> 
+            & 
+            Back-End:
+            <span class="backend">
+                <a href="https://t.me/mostafarrashwan"> Mostafa</a>
+            </span>
         </p>
+
     </footer>
 
 

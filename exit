@@ -1,0 +1,29 @@
+[33mcommit 99fe61d78ea08ce73e3926181c8fa0061624892c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Mustafa <imos8afa@gmail.com>
+Date:   Fri Sep 12 23:43:20 2025 +0300
+
+    Design all home page models & finish the home views
+
+[33mcommit c298179cf7cc4a73b82084f6f157fc35d92b201b[m
+Author: Mustafa <imos8afa@gmail.com>
+Date:   Thu Sep 11 20:03:41 2025 +0300
+
+    Add initial analysis and basics apps
+
+[33mcommit f708fd96e16eae23c246d7510909667d567632a6[m
+Author: Mustafa <imos8afa@gmail.com>
+Date:   Thu Sep 11 19:22:13 2025 +0300
+
+    configure static/media settings, Integrate and organize frontend templates
+
+[33mcommit 2162478a4bee6ee23a58f380b69637c37827dc59[m
+Author: Mustafa <imos8afa@gmail.com>
+Date:   Thu Sep 11 19:08:51 2025 +0300
+
+    Initialize Django project structure
+
+[33mcommit ff79a3731f791e8a54cf02dab5059af4fc72bbb4[m
+Author: Mostafa Mohamed Rashwan <imos8afa@gmail.com>
+Date:   Thu Sep 11 19:00:34 2025 +0300
+
+    Initial commit

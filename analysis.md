@@ -94,4 +94,13 @@ member:
     - comeback
     - how hear about fitra
 
+______________________________________________________
+Frontend edits
 
+1- create form page
+2- put the pack image in html file
+3- make successfull stories only 4
+______________________________________________________
+
+problems
+1- translate connection

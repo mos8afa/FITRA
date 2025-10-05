@@ -34,12 +34,18 @@ class SuccessfullStories(models.Model):
     name = models.CharField(verbose_name = 'Name', max_length = 200)
     before_image = models.ImageField(verbose_name = 'Before Image', upload_to ='settings/') 
     after_image = models.ImageField(verbose_name = 'After Image', upload_to ='settings/') 
+    def __str__(self):
+        return self.name
 
 class PackadgeAdvantage(models.Model):
     advantages = models.TextField(verbose_name = 'Pack Advantages')
+    def __str__(self):
+        return self.advantages
 
 class PackadgeDisadvantage(models.Model):
     disadvantages = models.TextField(verbose_name = 'Pack Disadvantages')
+    def __str__(self):
+        return self.disadvantages
 
 class Packadges(models.Model):
     name  = models.CharField(verbose_name = 'Packadge', max_length = 200)

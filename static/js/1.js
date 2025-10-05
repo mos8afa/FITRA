@@ -52,7 +52,30 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+// Mobile Menu Toggle - Accessible 3 شرط
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.querySelector(".toggle-menu"); // الأيقونة
+  const navMenu = document.querySelector("header nav ul"); // القائمة
 
+  // نخلي الأيقونة زرار Accessible
+  toggleBtn.setAttribute("role", "button");
+  toggleBtn.setAttribute("tabindex", "0");
+  toggleBtn.setAttribute("aria-label", "Toggle menu");
+
+  function toggleMenu() {
+    navMenu.classList.toggle("show-menu");
+  }
+
+  toggleBtn.addEventListener("click", toggleMenu);
+
+  // عشان كمان لو ضغط Enter من الكيبورد تشتغل
+  toggleBtn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleMenu();
+    }
+  });
+});
 
 
 

@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 
 
@@ -34,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'settings',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,11 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'members',
     'django_summernote',
+    
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -115,6 +121,16 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+
+LANGUAGES = [
+    ("ar", _("Arabic")),
+    ("en", _("English")),
+]
 
 
 # Static files (CSS, JavaScript, Images)

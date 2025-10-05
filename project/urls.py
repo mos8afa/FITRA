@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('settings.urls', namespace = 'home')),
     path('summernote/', include('django_summernote.urls')),
+    path('i18n/',include('django.conf.urls.i18n'))
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
