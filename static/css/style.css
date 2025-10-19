@@ -577,6 +577,12 @@ section .container .about p
     margin: 35px 0px;
 }
 
+section .container .about p span
+{
+    position: absolute;
+    left: 20px;
+}
+
 section .container .section
 {
     width: 30%;
@@ -1285,68 +1291,66 @@ aside .container .plans .card div ul li .red
     color: var(--main-color);
 }
 
-.stories-container 
-{
-    gap: 15px;
-    display: flex;
-    flex-wrap: nowrap;
-    overflow: visible;
+/* Owl Carousel */
+.stories-carousel {
+    max-width: 85%; 
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
-    justify-content: space-between;
-    width: 90%;
-    max-width: 100%;
-    margin: 40px auto 0;
 }
 
-.stories-nav 
-{
+.stories-carousel .owl-item {
+    animation: none !important; 
+}
+
+.stories-carousel.owl-carousel .owl-nav {
     position: absolute;
     top: 50%;
     width: 100%;
     z-index: 10;
-    pointer-events: none;
     transform: translateY(-50%);
+    pointer-events: none; 
 }
 
-.stories-nav i 
-{
-    z-index: 9999;
-    cursor: pointer;
-    display: flex;
+.stories-carousel.owl-carousel .owl-nav button {
     position: absolute;
-    align-items: center;
-    justify-content: center;
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    pointer-events: auto;
-    color: var(--main-color);
-    border: 2px solid var(--main-color);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 2px solid var(--main-color) !important;
+    color: var(--main-color) !important;
     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    pointer-events: auto; 
     transition: all 0.3s ease;
 }
 
-.stories-nav i:hover 
-{
-    color: white;
-    background: var(--main-color);
+.stories-carousel.owl-carousel .owl-nav button:hover {
+    color: white !important;
+    background: var(--main-color) !important;
     transform: scale(1.1);
 }
 
-#prev-btn {
-    left: -60px;
+.stories-carousel.owl-carousel .owl-nav .owl-prev {
+    left: -60px; 
 }
 
-#next-btn {
-    right: -60px;
+.stories-carousel.owl-carousel .owl-nav .owl-next {
+    right: -60px; 
+}
+
+@media (max-width: 768px) {
+    .stories-carousel.owl-carousel .owl-nav .owl-prev {
+        left: -20px;
+    }
+    .stories-carousel.owl-carousel .owl-nav .owl-next {
+        right: -20px;
+    }
 }
 
 .story-transformation-card 
 {
     position: relative;
-    flex-shrink: 0;
-    width: 22%;
     height: 400px;
     padding: 15px;
     overflow: hidden;
@@ -1355,7 +1359,7 @@ aside .container .plans .card div ul li .red
     border-radius: 20px;
     background: rgb(0, 0, 0);
     border: 4px solid #47dd47; 
-    box-shadow: 6px 6px 10px 3px rgb(0 0 0 / 50%);
+    box-shadow: 3px 3px 10px 3px rgb(0 0 0 / 50%);
     transition: transform 0.5s ease;
 }
 
@@ -1364,7 +1368,6 @@ aside .container .plans .card div ul li .red
     position: absolute;
     top: 10px;
     left: 50%;
-    width: 45%;
     transform: translateX(-50%);
 }
 
@@ -1516,63 +1519,11 @@ aside .container .plans .card div ul li .red
     text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5), 0px 2px 3px rgb(0, 0, 0);
 }
 
-/* لما الكارت يطلع شمال */
-.fade-out-left {
-  animation: fadeOutLeft 0.6s forwards;
-}
-
-/* لما الكارت يدخل من يمين */
-.fade-in-right {
-  animation: fadeInRight 0.6s forwards;
-}
-
-/* لما الكارت يطلع يمين */
-.fade-out-right {
-  animation: fadeOutRight 0.6s forwards;
-}
-
-/* لما الكارت يدخل من شمال */
-.fade-in-left {
-  animation: fadeInLeft 0.6s forwards;
-}
-
-@keyframes fadeOutLeft {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(-80px); }
-}
-
-@keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(80px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes fadeOutRight {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(80px); }
-}
-
-@keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-80px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .stories-container {
-        gap: 20px;
-        flex-wrap: nowrap;
-        overflow: visible;
-        justify-content: center;
-    }
-    
+
     .story-transformation-card {
-        width: 30%;
         height: 430px;
-        min-width: 260px;
-    }
-    
-    .story-transformation-card:nth-child(4) {
-        display: none;
     }
 
     .story-photos-container::after {
@@ -1585,42 +1536,14 @@ aside .container .plans .card div ul li .red
 }
 
 @media (max-width: 992px) {
-    .stories-container {
-        gap: 20px;
-        flex-wrap: nowrap;
-        overflow: visible;
-        justify-content: center;
-    }
-    
     .story-transformation-card {
-        width: 45%;
         height: 430px;
-        min-width: 280px;
-    }
-    
-    .story-transformation-card:nth-child(3),
-    .story-transformation-card:nth-child(4) {
-        display: none;
     }
 }
 
 @media (max-width: 768px) {
-    .stories-container {
-        gap: 20px;
-        overflow: visible;
-        justify-content: center;
-    }
-    
     .story-transformation-card {
-        width: 85%;
         height: 430px;
-        max-width: 300px;
-    }
-    
-    .story-transformation-card:nth-child(2),
-    .story-transformation-card:nth-child(3),
-    .story-transformation-card:nth-child(4) {
-        display: none;
     }
     
     .stories-header h2 {
@@ -1629,30 +1552,6 @@ aside .container .plans .card div ul li .red
     
     .stories-header h3 {
         font-size: 1.5rem;
-    }
-    
-    .stories-nav i {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
-    }
-    
-    #prev-btn {
-        left: -20px;
-    }
-    
-    #next-btn {
-        right: -20px;
-    }
-}
-
-@media (max-width: 480px) {
-    #prev-btn {
-        left: -60px;
-    }
-    
-    #next-btn {
-        right: -60px;
     }
 }
 
