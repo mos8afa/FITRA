@@ -241,8 +241,18 @@
                 <h3>FITRA</h3>
                 <p>{% translate "Feel free to be a part of our family." %}</p>
             </div>
+            {% if LANGUAGE_CODE == 'ar' %}
             <div class="footer_2 fade-in">
                 <h3 class="dynamic-word">
+                    <span>ا</span>
+                    <span>ن</span>
+                    <span>و</span>
+                    <span>ر</span>
+                    <span>و</span>
+                    <span>ز</span>
+            {% else %}
+            <div class="footer_2 fade-in">
+                <h3 class="dynamic-word" >
                     <span>C</span>
                     <span>O</span>
                     <span>N</span>
@@ -253,6 +263,8 @@
                     <span>I</span>
                     <span>O</span>
                     <span>N</span>
+            {% endif %}
+            
                 </h3>
                 
 
