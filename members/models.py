@@ -127,6 +127,7 @@ class RoutineDetails(models.Model):
     hear_about_us = models.CharField(verbose_name='Hear about us', max_length=10, choices=HEAR_ABOUT_US)
 
 class BasicInfo(models.Model):
+    join_date = models.DateField(verbose_name='Join Date', auto_now_add=True)
     name = models.CharField(verbose_name='Name', max_length=60)
     age = models.PositiveSmallIntegerField(verbose_name='Age')
     height = models.DecimalField(verbose_name='Height (cm)', max_digits=5, decimal_places=2)
@@ -140,7 +141,7 @@ class BasicInfo(models.Model):
     education = models.CharField(verbose_name='Education', max_length=150)
     pictures = models.OneToOneField(Picture, on_delete=models.CASCADE, related_name='user_pictures', null=True, blank=True)
     sizes = models.OneToOneField(Size, on_delete=models.CASCADE, related_name='user_body_size',null=True, blank=True)
-    plane = models.CharField(verbose_name='Plan', max_length=9, choices=PLAN)
+    plan = models.CharField(verbose_name='Plan', max_length=9, choices=PLAN)
     recommend_us = models.IntegerField(verbose_name='Recommend us', choices=RECOMMEND_US)
     routine_details = models.OneToOneField(RoutineDetails, on_delete= models.CASCADE, related_name= 'user_routine_details')
     def __str__(self):
