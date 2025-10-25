@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import BasicInfo, Picture, RoutineDetails, Governorate, Goals
+from .models import Member, Picture, Governorate, Goals
 
 def register(request):
     if request.method == 'POST':
@@ -8,8 +8,8 @@ def register(request):
         height = request.POST.get('height')
         weight = request.POST.get('current_weight')
         weight_measure_date = request.POST.get('measurement_date')
-        gender = request.POST.get('gender')
-        images = request.FILES.getlist('male_photos')
+        gender = request.POST.get('gender') 
+        images = request.FILES.getlist('male_photos') if gender == 'male' else None
         sizes = request.POST.get('female_measurements') if gender == 'female' else None
         education = request.POST.get('occupation')
         governorate_name = request.POST.get('place_of_living')
@@ -33,26 +33,9 @@ def register(request):
         hear_about_us = request.POST.get('how_hear')
         recommend_us = request.POST.get('recommendation_rating')
 
-        routine = RoutineDetails.objects.create(
-            meals_num=meals_num,
-            daily_spend=daily_spend,
-            measure_scale=measure_scale,
-            workout_days=workout_days,
-            training_type=training_type,
-            habits=habits,
-            before_nutrition=before_nutrition,
-            injuries=injuries,
-            another_sports=another_sports,
-            previous_gym=previous_gym,
-            confidence=confidence,
-            comeback=comeback,
-            hear_about_us=hear_about_us
-        )
-
-
         governorate, _ = Governorate.objects.get_or_create(governorate_name=governorate_name)
 
-        member_info = BasicInfo.objects.create(
+        member_info = Member.objects.create(
             name=name,
             age=age,
             height=height,
@@ -67,7 +50,19 @@ def register(request):
             telegram_username=telegram_username,
             plan=plan,
             recommend_us=recommend_us,
-            routine_details=routine
+            meals_num=meals_num,
+            daily_spend=daily_spend,
+            measure_scale=measure_scale,
+            workout_days=workout_days,
+            training_type=training_type,
+            habits=habits,
+            before_nutrition=before_nutrition,
+            injuries=injuries,
+            another_sports=another_sports,
+            previous_gym=previous_gym,
+            confidence=confidence,
+            comeback=comeback,
+            hear_about_us=hear_about_us
         )
 
         Goals.objects.bulk_create([

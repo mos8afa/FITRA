@@ -1,110 +1,96 @@
+from django.utils.safestring import mark_safe
 from django.contrib import admin
-from .models import Governorate, RoutineDetails, Goals, BasicInfo, Picture
+from .models import Governorate, Member, Goals, Picture
 
-
-class PictureInline(admin.TabularInline):
-    model = Picture
-    extra = 1
-    readonly_fields = ['images']
-
-
+# -----------------------
+# Inline لعرض الأهداف
+# -----------------------
 class GoalsInline(admin.TabularInline):
     model = Goals
-    extra = 1
-
-
-class RoutineDetailsInline(admin.StackedInline):
-    model = RoutineDetails
     extra = 0
-    show_change_link = True
-    fieldsets = (
-        ('Training & Nutrition Info', {
-            'fields': (
-                'meals_num',
-                'training_type',
-                'workout_days',
-                'daily_spend',
-                'measure_scale',
-                'before_nutrition',
-                'injuries',
-                'previous_gym',
-                'another_sports',
-                'habits',
-            )
-        }),
-        ('Mindset & Motivation', {
-            'fields': (
-                'confidence',
-                'comeback',
-                'hear_about_us',
-            )
-        }),
-    )
+    readonly_fields = ('goal',)
+    can_delete = True
 
+# -----------------------
+# Inline لعرض الصور
+# -----------------------
+class PictureInline(admin.TabularInline):
+    model = Picture
+    extra = 0
+    readonly_fields = ('image_tag',)
+    can_delete = True
 
-@admin.register(BasicInfo)
-class BasicInfoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'age', 'gender', 'plan', 'place', 'join_date', 'recommend_us')
-    list_filter = ('gender', 'plan', 'place', 'join_date')
-    search_fields = ('name', 'email', 'whatsapp_number')
+    def image_tag(self, obj):
+        if obj.images:
+            return mark_safe(f'<img src="{obj.images.url}" width="100" style="border-radius:8px;"/>')
+        return "-"
+    image_tag.short_description = 'Image'
+
+# -----------------------
+# Member Admin
+# -----------------------
+@admin.register(Member)
+class MemberAdmin(admin.ModelAdmin):
+    list_display = ('name', 'age', 'place', 'plan', 'join_date', 'training_type')
+    list_filter = ('gender', 'plan', 'training_type', 'place', 'age')
+    search_fields = ('name', 'whatsapp_number', 'email', 'telegram_username')
+    ordering = ('-join_date',)
     readonly_fields = ('join_date', 'weight_measure_date')
-
+    inlines = [GoalsInline, PictureInline]  
     fieldsets = (
-        ('Personal Information', {
-            'fields': (
-                'name',
-                'age',
-                'gender',
-                'education',
-                'place',
-                'plan',
-                'recommend_us',
-            )
+        ('Personal Info', {
+            'fields': ('name', 'age', 'gender', 'education', 'place', 'whatsapp_number', 'email', 'telegram_username')
         }),
-        ('Physical Data', {
-            'fields': (
-                'height',
-                'weight',
-                'weight_measure_date',
-                'sizes',
-            )
+        ('Body Info', {
+            'fields': ('height', 'weight', 'weight_measure_date', 'sizes', 'measure_scale')
         }),
-        ('Contact Details', {
-            'fields': (
-                'whatsapp_number',
-                'email',
-                'telegram_username',
-            )
+        ('Fitness Plan', {
+            'fields': ('plan', 'meals_num', 'training_type', 'workout_days', 'daily_spend')
         }),
-        ('Routine Details', {
-            'fields': ('routine_details',)
+        ('History & Habits', {
+            'fields': ('before_nutrition', 'injuries', 'previous_gym', 'another_sports', 'habits')
+        }),
+        ('Motivation & Feedback', {
+            'fields': ('confidence', 'comeback', 'hear_about_us', 'recommend_us')
         }),
     )
 
-    inlines = [GoalsInline, PictureInline]
-
-
+# -----------------------
+# Governorate Admin
+# -----------------------
 @admin.register(Governorate)
-class GovernrateAdmin(admin.ModelAdmin):
+class GovernorateAdmin(admin.ModelAdmin):
     list_display = ('governorate_name',)
     search_fields = ('governorate_name',)
 
+    def has_module_permission(self, request):
+        return False 
 
-@admin.register(RoutineDetails)
-class RoutineDetailsAdmin(admin.ModelAdmin):
-    list_display = ('training_type', 'workout_days', 'daily_spend', 'previous_gym', 'confidence')
-    list_filter = ('training_type', 'workout_days', 'confidence')
-    search_fields = ('before_nutrition', 'injuries')
-
-
+# -----------------------
+# Goals Admin
+# -----------------------
 @admin.register(Goals)
 class GoalsAdmin(admin.ModelAdmin):
     list_display = ('member', 'goal')
     list_filter = ('goal',)
-    search_fields = ('member__name', 'goal')
+    search_fields = ('member__name',)
 
+    def has_module_permission(self, request):
+        return False 
 
+# -----------------------
+# Picture Admin
+# -----------------------
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
-    list_display = ('member', 'images')
-    search_fields = ('member__name',)
+    list_display = ('member', 'image_tag')
+    readonly_fields = ('image_tag',)
+
+    def has_module_permission(self, request):
+        return False 
+
+    def image_tag(self, obj):
+        if obj.images:
+            return mark_safe(f'<img src="{obj.images.url}" width="100" style="border-radius:8px;"/>')
+        return "-"
+    image_tag.short_description = 'Image'
