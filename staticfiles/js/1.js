@@ -52,6 +52,31 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+// Mobile Menu Toggle - Accessible 3 شرط
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.querySelector(".toggle-menu"); // الأيقونة
+  const navMenu = document.querySelector("header nav ul"); // القائمة
+
+  // نخلي الأيقونة زرار Accessible
+  toggleBtn.setAttribute("role", "button");
+  toggleBtn.setAttribute("tabindex", "0");
+  toggleBtn.setAttribute("aria-label", "Toggle menu");
+
+  function toggleMenu() {
+    navMenu.classList.toggle("show-menu");
+  }
+
+  toggleBtn.addEventListener("click", toggleMenu);
+
+  // عشان كمان لو ضغط Enter من الكيبورد تشتغل
+  toggleBtn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleMenu();
+    }
+  });
+});
+
 
 
 
@@ -144,211 +169,150 @@ animate();
 // Divider-handle 
 document.querySelectorAll('.story-photo-comparison').forEach(setupComparison);
 
+// 🛑 علامة عالمية (Global Flag) لضمان تشغيل أنيميشن الـ Divider مرة واحدة فقط.
+let hasCarouselAutoAnimPlayed = false;
+const carouselSelector = '.stories-carousel';
+
 function setupComparison(container) {
-  const imgAfterContainer = container.querySelector('.img-after-container');
-  const handle = container.querySelector('.divider-handle');
-  let isDragging = false;
-  let autoAnimPlayed = false;
+    const imgAfterContainer = container.querySelector('.img-after-container');
+    const handle = container.querySelector('.divider-handle');
+    let isDragging = false;
+    
+    // أضيف الدايرة جوا الهاندل
+    const circle = document.createElement('div');
+    circle.classList.add('handle-circle');
+    handle.appendChild(circle);
 
-  // أضيف الدايرة جوا الهاندل
-  const circle = document.createElement('div');
-  circle.classList.add('handle-circle');
-  handle.appendChild(circle);
+    const startDrag = e => {
+        // *******************************************************
+        // 🔴 التعديل الجوهري: منع انتقال الحدث إلى الـ Owl Carousel
+        // *******************************************************
+        // هذا يضمن أن سحب الـ handle لا يُعتبر سحبًا للـ card.
+        e.stopPropagation(); 
+        
+        isDragging = true;
+        
+        // 💡 إيقاف الـ Owl Carousel مؤقتاً عند بداية السحب
+        $(carouselSelector).trigger('stop.owl.autoplay'); 
+        
+        onDrag(e); 
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchmove', onDrag);
+        document.addEventListener('touchend', endDrag);
+    };
 
-  const startDrag = e => {
-    isDragging = true;
-    onDrag(e); // أول ما يضغط يتحرك مباشرة
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', endDrag);
-    document.addEventListener('touchmove', onDrag);
-    document.addEventListener('touchend', endDrag);
-  };
+    const onDrag = e => {
+        if (!isDragging) return;
 
-  const onDrag = e => {
-    if (!isDragging) return;
+        const rect = container.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let offsetX = clientX - rect.left;
 
-    const rect = container.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    let offsetX = clientX - rect.left;
+        if (offsetX < 0) offsetX = 0;
+        if (offsetX > rect.width) offsetX = rect.width;
 
-    if (offsetX < 0) offsetX = 0;
-    if (offsetX > rect.width) offsetX = rect.width;
+        const percent = (offsetX / rect.width) * 100;
+        imgAfterContainer.style.width = percent + '%';
+        handle.style.left = offsetX - (handle.offsetWidth / 2) + 'px';
+    };
 
-    const percent = (offsetX / rect.width) * 100;
-    imgAfterContainer.style.width = percent + '%';
-    handle.style.left = offsetX - (handle.offsetWidth / 2) + 'px';
-  };
+    const endDrag = () => {
+        isDragging = false;
+        
+        // 💡 إعادة تشغيل الـ AutoPlay للـ Owl Carousel
+        const owl = $(carouselSelector).data('owl.carousel');
+        if (owl && owl.options.autoplay) {
+             $(carouselSelector).trigger('play.owl.autoplay');
+        }
 
-  const endDrag = () => {
-    isDragging = false;
-    document.removeEventListener('mousemove', onDrag);
-    document.removeEventListener('mouseup', endDrag);
-    document.removeEventListener('touchmove', onDrag);
-    document.removeEventListener('touchend', endDrag);
-  };
+        document.removeEventListener('mousemove', onDrag);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('touchmove', onDrag);
+        document.removeEventListener('touchend', endDrag);
+    };
 
-  // ✅ اسحب من أي مكان في الكونتينر
-  container.addEventListener('mousedown', startDrag);
-  container.addEventListener('touchstart', startDrag);
+    // ✅ ربط السحب بالـ Handle فقط (لتنفيذ طلبك)
+    handle.addEventListener('mousedown', startDrag);
+    handle.addEventListener('touchstart', startDrag);
 
-  // ===============================
-  // ✅ أنيميشن أول ما السكشن يظهر
-  // ===============================
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !autoAnimPlayed) {
-        autoAnimPlayed = true;
-        playAutoAnimation();
-      }
-    });
-  }, { threshold: 0.5 });
 
-  observer.observe(container);
+    // ===============================
+    // ✅ أنيميشن أول ما السكشن يظهر 
+    // ===============================
+    
+    // نشغل الـ Observer على أول كارت فقط
+    const isFirstComparison = container === document.querySelector('.story-photo-comparison');
 
-  function playAutoAnimation() {
-    const rect = container.getBoundingClientRect();
-    let positions = [0.5, 0.95, 0.05, 0.5]; // نص → يمين → شمال → نص
-    let i = 0;
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !hasCarouselAutoAnimPlayed) {
+                hasCarouselAutoAnimPlayed = true; 
+                
+                document.querySelectorAll('.story-photo-comparison').forEach(comp => {
+                    playAutoAnimation(comp, comp === container); 
+                });
 
-    function animate() {
-      if (i >= positions.length) {
-        // 🟢 بعد آخر حركة: شيل الـ transition علشان السحب يبقى سلس
-        imgAfterContainer.style.transition = "none";
-        handle.style.transition = "none";
-        return;
-      }
+                observer.unobserve(container);
+            }
+        });
+    }, { threshold: 0.2 });
 
-      let percent = positions[i] * 100;
-
-      imgAfterContainer.style.transition = "width 1.5s ease-in-out";
-      handle.style.transition = "left 1.5s ease-in-out";
-
-      imgAfterContainer.style.width = percent + '%';
-      handle.style.left = (rect.width * positions[i]) - (handle.offsetWidth / 2) + 'px';
-
-      i++;
-      setTimeout(animate, 1600); // بعد كل حركة
+    if (isFirstComparison) {
+        observer.observe(container);
     }
 
-    animate();
-  }
+
+    function playAutoAnimation(comparisonElement, shouldStartAutoPlay) {
+        const afterContainer = comparisonElement.querySelector('.img-after-container');
+        const handle = comparisonElement.querySelector('.divider-handle');
+        const rect = comparisonElement.getBoundingClientRect();
+        
+        let positions = [0.5, 0.95, 0.05, 0.5]; 
+        let i = 0;
+        const duration = 1500;
+        const delay = 1600;
+
+        function startCarouselAutoPlay() {
+             const owl = $(carouselSelector).data('owl.carousel');
+             if (owl) {
+                 // تفعيل خيار الأوتو بلاي في إعدادات الـ Owl Carousel
+                 owl.settings.autoplay = true; 
+                 owl.options.autoplay = true; 
+                 $(carouselSelector).trigger('play.owl.autoplay', [5000]); // تشغيل الأوتو بلاي بمدة 5 ثواني
+             }
+        }
+        
+        function animate() {
+            if (i >= positions.length) {
+                // بعد آخر حركة: شيل الـ transition علشان السحب يبقى سلس
+                afterContainer.style.transition = "none";
+                handle.style.transition = "none";
+
+                if (shouldStartAutoPlay) {
+                    startCarouselAutoPlay(); 
+                }
+                
+                return;
+            }
+
+            let percent = positions[i] * 100;
+
+            afterContainer.style.transition = `width ${duration / 1000}s ease-in-out`;
+            handle.style.transition = `left ${duration / 1000}s ease-in-out`;
+
+            afterContainer.style.width = percent + '%';
+            handle.style.left = (rect.width * positions[i]) - (handle.offsetWidth / 2) + 'px';
+
+            i++;
+            setTimeout(animate, delay);
+        }
+
+        animate();
+    }
 }
 
-// DRAG
+// DRAG (لتحديد خاصية عدم السحب للصور)
 document.querySelectorAll('.story-photo-comparison img').forEach(img => {
-  img.setAttribute('draggable', 'false');
-});
-
-
-
-
-
-
-
-
-
-
-// Successful Stories Carousel Function - تبديل التحولات
-document.addEventListener("DOMContentLoaded", () => {
-  const container = document.querySelector(".stories-container");
-  let cards = Array.from(container.querySelectorAll(".story-transformation-card"));
-  const nextBtn = document.getElementById("next-btn");
-  const prevBtn = document.getElementById("prev-btn");
-
-  let isAnimating = false;
-  const duration = 600; // لازم تبقى نفس اللي في CSS transition
-
-  function showNext() {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    cards.forEach(card => {
-      card.style.transition = `transform ${duration}ms ease`;
-      card.style.transform = "translateX(-110%)";
-    });
-
-    const oldCard = cards[0];
-    oldCard.classList.add("fade-out-left");
-
-    setTimeout(() => {
-      cards.forEach(card => {
-        card.style.transition = "none";
-        card.style.transform = "translateX(0)";
-      });
-
-      oldCard.classList.remove("fade-out-left");
-      container.appendChild(oldCard);
-
-      cards = Array.from(container.querySelectorAll(".story-transformation-card"));
-
-      const newCard = cards[cards.length - 1];
-      newCard.classList.add("fade-in-right");
-      setTimeout(() => newCard.classList.remove("fade-in-right"), duration);
-
-      isAnimating = false;
-    }, duration);
-  }
-
-  function showPrev() {
-    if (isAnimating) return;
-    isAnimating = true;
-
-    cards.forEach(card => {
-      card.style.transition = `transform ${duration}ms ease`;
-      card.style.transform = "translateX(110%)";
-    });
-
-    const oldCard = cards[cards.length - 1];
-    oldCard.classList.add("fade-out-right");
-
-    setTimeout(() => {
-      cards.forEach(card => {
-        card.style.transition = "none";
-        card.style.transform = "translateX(0)";
-      });
-
-      oldCard.classList.remove("fade-out-right");
-      container.insertBefore(oldCard, cards[0]);
-
-      cards = Array.from(container.querySelectorAll(".story-transformation-card"));
-
-      const newCard = cards[0];
-      newCard.classList.add("fade-in-left");
-      setTimeout(() => newCard.classList.remove("fade-in-left"), duration);
-
-      isAnimating = false;
-    }, duration);
-  }
-
-  nextBtn.addEventListener("click", showNext);
-  prevBtn.addEventListener("click", showPrev);
-
-  // ------------------------
-  // دعم اللمس (Swipe) من 1200px فقط
-  // ------------------------
-  let startX = 0;
-  let endX = 0;
-
-  container.addEventListener("touchstart", (e) => {
-    if (window.innerWidth >= 1200) {
-      startX = e.touches[0].clientX;
-    }
-  });
-
-  container.addEventListener("touchend", (e) => {
-    if (window.innerWidth >= 1200) {
-      endX = e.changedTouches[0].clientX;
-      const diff = endX - startX;
-
-      if (Math.abs(diff) > 50) { // لازم يكون السحب واضح (50px)
-        if (diff > 0) {
-          // Swipe Right = Prev (زي زرار الشمال)
-          showPrev();
-        } else {
-          // Swipe Left = Next (زي زرار اليمين)
-          showNext();
-        }
-      }
-    }
-  });
+  img.setAttribute('draggable', 'false');
 });

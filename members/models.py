@@ -90,25 +90,41 @@ RECOMMEND_US = [
     (5,5),
 ]
 
+GOVERNRATE = [
+    ("Alexandria","Alexandria"),
+    ("Aswan","Aswan"),
+    ("Asyut","Asyut"),
+    ('Beheira','Beheira'),
+    ('Beni Suef','Beni Suef'),
+    ("Cairo","Cairo"),
+    ("Dakahlia","Dakahlia"),
+    ("Damietta","Damietta"),
+    ("Faiyum","Faiyum"),
+    ("Gharbia","Gharbia"),
+    ("Giza","Giza"),
+    ("Ismailia","Ismailia"),
+    ("Kafr El Sheikh","Kafr El Sheikh"),
+    ("Luxor","Luxor"),
+    ("Matruh","Matruh"),
+    ("Minya","Minya"),
+    ("Monufia","Monufia"),
+    ("New Valley",'New Valley (Wadi El Gedid)'),
+    ("North Sinai","North Sinai"),
+    ("Port Said","Port Said"),
+    ("Qalyubia","Qalyubia"),
+    ("Qena","Qena"),
+    ("Red Sea","Red Sea"),
+    ("Sharqia","Sharqia"),
+    ("Sohag","Sohag"),
+    ("South Sinai","South Sinai"),
+    ("Suez","Suez"),
+]
+
 class Governrate(models.Model):
-    name = models.CharField(verbose_name='Governrate name', max_length=50)
+    governrate_name = models.CharField(verbose_name='Governrate name', max_length=30, choices=GOVERNRATE)
     def __str__(self):
         return self.name
-
-class Picture(models.Model):
-    side1 = models.ImageField(verbose_name='Side 1 photo', upload_to='members/')
-    side2 = models.ImageField(verbose_name='Side 2 photo', upload_to='members/')
-    front = models.ImageField(verbose_name='Front photo', upload_to='members/')
-    back = models.ImageField(verbose_name='Back photo', upload_to='members/')
-
-class Size(models.Model):
-    right_arm = models.CharField(verbose_name='Right Arm', max_length=4)
-    left_arm = models.CharField(verbose_name='Left Arm', max_length=4)
-    right_thigh = models.CharField(verbose_name='Right Thigh', max_length=4)
-    left_thigh = models.CharField(verbose_name='Left Thigh', max_length=4)
-    waist = models.CharField(verbose_name='Waist', max_length=4)
-    belly = models.CharField(verbose_name='Belly', max_length=4)
-    chest = models.CharField(verbose_name='Chest', max_length=4)
+    
 
 class RoutineDetails(models.Model):
     goal = models.CharField(verbose_name='Fitness Goal', max_length=30, choices=FITNESS_GOAL)
@@ -139,15 +155,16 @@ class BasicInfo(models.Model):
     place = models.ForeignKey(Governrate,on_delete=models.PROTECT, related_name='user_governrate')
     gender = models.CharField(verbose_name='Gender', max_length=6, choices=GENDER)
     education = models.CharField(verbose_name='Education', max_length=150)
-    pictures = models.OneToOneField(Picture, on_delete=models.CASCADE, related_name='user_pictures', null=True, blank=True)
-    sizes = models.OneToOneField(Size, on_delete=models.CASCADE, related_name='user_body_size',null=True, blank=True)
+    sizes = models.TextField(null=True, blank=True)
     plan = models.CharField(verbose_name='Plan', max_length=9, choices=PLAN)
     recommend_us = models.IntegerField(verbose_name='Recommend us', choices=RECOMMEND_US)
     routine_details = models.OneToOneField(RoutineDetails, on_delete= models.CASCADE, related_name= 'user_routine_details')
     def __str__(self):
         return self.name
     
-
+class Picture(models.Model):
+    member = models.ForeignKey(BasicInfo,on_delete=models.CASCADE, related_name='user_images')
+    images = models.ImageField(verbose_name='images', upload_to='members/', null=True, blank=True)
 
 
     

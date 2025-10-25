@@ -66,7 +66,7 @@
                 <li><a href="/">{% translate "Home" %}</a></li>
                 <li><a href="#Packages">{% translate "Packages" %} <i class="bi bi-cart3"></i></a></li>
                 <li><a href="#Contact">{% translate "Contact US" %}</a></li>
-                <li><a class="active" href="#Packages">{% translate "Become a Member" %}</a></li>
+                <li><a class="active" href="{% url 'members:register' %}">{% translate "Become a Member" %}</a></li>
 
                 {% get_current_language as LANGUAGE_CODE %}
 
@@ -207,7 +207,7 @@
                         </article>
                         <p>{{pack.time}}</p>
                         <span class="btn">
-                            <a href="https://forms.gle/wTqGzTY2gveHoTaC8">{% translate "Join Now" %}</a>
+                            <a href="{% url 'members:register' %}">{% translate "Join Now" %}</a>
                         </span>
                         <ul>
                         {% for advantage in pack.advantages.all  %}

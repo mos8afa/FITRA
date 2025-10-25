@@ -31,7 +31,7 @@
             font-family: 'Inter', sans-serif;
             
             /* Image Background Setup */
-            background-image: url("{% static 'BG_Form.jpg' %}"); 
+            background-image: url({% static 'img/BG_FORM.jpg' %}); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed; /* Keep image fixed when scrolling */
@@ -120,6 +120,18 @@
             background-size: 0.65em auto;
             padding-right: 2.5rem;
         }
+        /* لإخفاء الأسهم في Chrome, Safari, Edge */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+
+        /* لإخفائها في Firefox */
+        input[type=number] {
+        -moz-appearance: textfield;
+        }
+
     </style>
 </head>
 <body class="p-4 md:p-8 text-gray-100">
@@ -133,7 +145,8 @@
         </header>
 
         <form id="fitra-form" class="space-y-8">
-              {% csrf_token %}
+            {% csrf_token %}
+
             <!-- Core Personal Data Section: Using the slightly lighter dark gray color -->
             <section class="p-5 bg-section-dark-bg rounded-lg shadow-inner">
                 <h2 class="text-2xl font-bold text-main-fitra mb-6 border-b pb-2 border-gray-600">Personal Information</h2>
@@ -141,19 +154,19 @@
                 <!-- Full Name -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="full_name"><span class="required-label">Full Name</span></label>
-                    {{form.name}}
+                    <input type="text" id="full_name" name="full_name" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your full name" maxlength='60'>
                 </div>
 
                 <!-- Age & Height -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="age"><span class="required-label">Age</span></label>
-                        {{form.age}}
+                        <input type="number" id="age" name="age" min="10" max="100" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your age (number)">
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="height"><span class="required-label">Height (CM)</span></label>
-                        {{form.height}}
+                        <input type="number" id="height" name="height" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your height in CM" min='0' max='299.99' step='0.01'>
                     </div>
                 </div>
 
@@ -161,12 +174,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="current_weight"><span class="required-label">Current Weight (KG)</span></label>
-                        {{form.weight}}
+                        <input type="number" id="current_weight" name="current_weight" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your current weight in KG" min="0" max='299.99' step='0.01'>
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="measurement_date"><span class="required-label">Weight Measurement Date</span></label>
-                        {{form.weight_measure_date}}
+                        <input type="date" id="measurement_date" name="measurement_date" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150"value="{{ today|date:"Y-m-d" }}">
                     </div>
                 </div>
                 
@@ -175,11 +188,11 @@
                     <label class="block text-lg font-medium mb-2"><span class="required-label">Gender</span></label>
                     <div class="flex flex-wrap gap-4">
                         <div>
-                            <input type="radio" id="gender-male" name="gender" value="Male" required class="custom-radio-input">
+                            <input type="radio" id="gender-male" name="gender" value="MALE" required class="custom-radio-input">
                             <label for="gender-male" class="custom-label">Male</label>
                         </div>
                         <div>
-                            <input type="radio" id="gender-female" name="gender" value="Female" required class="custom-radio-input">
+                            <input type="radio" id="gender-female" name="gender" value="FEMALE" required class="custom-radio-input">
                             <label for="gender-female" class="custom-label">Female</label>
                         </div>
                     </div>
@@ -211,7 +224,7 @@
                 <!-- Occupation or academic year -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="occupation"><span class="required-label">Occupation or Academic Year</span></label>
-                    {{form.education}}
+                    <input type="text" id="occupation" name="occupation" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="e.g., Engineer, 4th Year Science" maxlength="150">
                 </div>
                 
                 <!-- Place of living (Egypt Governorates) -->
@@ -259,20 +272,20 @@
                 <!-- Phone number (with Whatsapp) - **Validation added to ensure it starts with 01** -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="phone"><span class="required-label">Phone Number (with WhatsApp)</span></label>
-                    {{form.whatsapp_number}}
+                    <input type="tel" id="phone" name="phone" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="e.g., 01XXXXXXXXX" maxlength="13">
                     <p class="text-sm text-gray-400 mt-1">Must start with '01'</p>
                 </div>
 
                 <!-- Email -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="email">Email (Optional)</label>
-                    {{form.email}}
+                    <input type="email" id="email" name="email" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Your answer">
                 </div>
 
                 <!-- (Optional) Telegram user -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="telegram_user">Telegram User (Optional)</label>
-                    {{form.telegram_username}}
+                    <input type="text" id="telegram_user" name="telegram_user" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Like @example" maxlength="50">
                 </div>
             </section>
 
