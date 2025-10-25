@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import BasicInfo, Picture, RoutineDetails, Governrate
-
+from .models import BasicInfo, Picture, RoutineDetails, Governorate, Goals
 
 def register(request):
     if request.method == 'POST':
@@ -13,11 +12,11 @@ def register(request):
         images = request.FILES.getlist('male_photos')
         sizes = request.POST.get('female_measurements') if gender == 'female' else None
         education = request.POST.get('occupation')
-        governrate_name = request.POST.get('place_of_living')
+        governorate_name = request.POST.get('place_of_living')
         whatsapp_number = request.POST.get('phone')
         email = request.POST.get('email')
         telegram_username = request.POST.get('telegram_user')
-        goal = request.POST.get('fitness_goal')
+        goals = request.POST.getlist('fitness_goal') 
         meals_num = request.POST.get('meals_per_day')
         daily_spend = request.POST.get('food_budget')
         measure_scale = request.POST.get('measuring_scale')
@@ -35,7 +34,6 @@ def register(request):
         recommend_us = request.POST.get('recommendation_rating')
 
         routine = RoutineDetails.objects.create(
-            goal=goal,
             meals_num=meals_num,
             daily_spend=daily_spend,
             measure_scale=measure_scale,
@@ -49,10 +47,10 @@ def register(request):
             confidence=confidence,
             comeback=comeback,
             hear_about_us=hear_about_us
-            )
-        governrate = Governrate.objects.get_or_create(
-            governrate_name, _ =governrate_name
         )
+
+
+        governorate, _ = Governorate.objects.get_or_create(governorate_name=governorate_name)
 
         member_info = BasicInfo.objects.create(
             name=name,
@@ -63,7 +61,7 @@ def register(request):
             gender=gender,
             sizes=sizes,
             education=education,
-            place=governrate,
+            place=governorate,
             whatsapp_number=whatsapp_number,
             email=email,
             telegram_username=telegram_username,
@@ -72,9 +70,15 @@ def register(request):
             routine_details=routine
         )
 
-        Picture.objects.bulk_create([Picture(member=member_info, images=image) for image in images])
+        Goals.objects.bulk_create([
+            Goals(member=member_info, goal=goal) for goal in goals
+        ])
 
-        return redirect('home')
-    
+        if images:
+            Picture.objects.bulk_create([
+                Picture(member=member_info, images=image) for image in images
+            ])
+
+        return redirect('settings:home')
+
     return render(request, 'members/form.html')
-

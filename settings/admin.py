@@ -21,7 +21,6 @@ class PacksAdmin(SummernoteModelAdmin, TranslationAdmin):
     list_display = ['name']
     form = PackadgesForm   
 
-# --------- REGISTER ---------
 admin.site.register(models.Info, SomeModelAdmin)
 admin.site.register(models.Brief, SomeModelAdmin)
 admin.site.register(models.AboutUs, SomeModelAdmin)
