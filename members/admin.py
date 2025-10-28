@@ -32,7 +32,7 @@ class PictureInline(admin.TabularInline):
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'age', 'place', 'plan', 'join_date', 'training_type')
-    list_filter = ('gender', 'plan', 'training_type', 'place', 'age')
+    list_filter = ('gender', 'plan', 'training_type', 'place')
     search_fields = ('name', 'whatsapp_number', 'email', 'telegram_username')
     ordering = ('-join_date',)
     readonly_fields = ('join_date', 'weight_measure_date')

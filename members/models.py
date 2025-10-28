@@ -157,6 +157,7 @@ class Member(models.Model):
     confidence = models.CharField(verbose_name=_('Confidence'), max_length=10, choices=CONFIDENCE)
     comeback = models.CharField(verbose_name=_('Comeback'), max_length=10, choices=COMEBACK)
     hear_about_us = models.CharField(verbose_name=_('How hear about us?'), max_length=10, choices=HEAR_ABOUT_US)
+    is_activated = models.BooleanField(verbose_name=('IS Activated'), default=False)
     def __str__(self):
         return self.name
 

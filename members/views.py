@@ -1,5 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.conf import settings
 from .models import Member, Picture, Governorate, Goals
+from django.template.loader import render_to_string
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
+
+signer = TimestampSigner()
 
 def register(request):
     if request.method == 'POST':
@@ -8,15 +16,15 @@ def register(request):
         height = request.POST.get('height')
         weight = request.POST.get('current_weight')
         weight_measure_date = request.POST.get('measurement_date')
-        gender = request.POST.get('gender') 
-        images = request.FILES.getlist('male_photos') if gender == 'male' else None
-        sizes = request.POST.get('female_measurements') if gender == 'female' else None
+        gender = request.POST.get('gender')
+        images = request.FILES.getlist('male_photos') 
+        sizes = request.POST.get('female_measurements') 
         education = request.POST.get('occupation')
         governorate_name = request.POST.get('place_of_living')
         whatsapp_number = request.POST.get('phone')
         email = request.POST.get('email')
         telegram_username = request.POST.get('telegram_user')
-        goals = request.POST.getlist('fitness_goal') 
+        goals = request.POST.getlist('fitness_goal')
         meals_num = request.POST.get('meals_per_day')
         daily_spend = request.POST.get('food_budget')
         measure_scale = request.POST.get('measuring_scale')
@@ -32,6 +40,12 @@ def register(request):
         comeback = request.POST.get('return_continuity')
         hear_about_us = request.POST.get('how_hear')
         recommend_us = request.POST.get('recommendation_rating')
+
+        existing_member = Member.objects.filter(email=email, is_activated=True).first()
+        if existing_member:
+            return render(request, 'members/form.html', {
+                'alert_message': 'هذا البريد الإلكتروني مستخدم بالفعل. الرجاء استخدام بريد آخر.'
+            })
 
         governorate, _ = Governorate.objects.get_or_create(governorate_name=governorate_name)
 
@@ -74,6 +88,51 @@ def register(request):
                 Picture(member=member_info, images=image) for image in images
             ])
 
-        return redirect('settings:home')
+        token = signer.sign(member_info.id)
+        activation_link = request.build_absolute_uri(
+            reverse('members:activate', kwargs={'token': token})
+        )
+
+        subject = 'تفعيل حسابك في Fitra'
+        message = render_to_string('members/activation_email.html', {
+            'name': name,
+            'activation_link': activation_link,
+        })
+
+        send_mail(subject, '', settings.DEFAULT_FROM_EMAIL, [email], html_message=message)
+
+        return render(request, 'members/form.html', {
+            'alert_message': 'تحقق من بريدك الإلكتروني لتفعيل الحساب.'
+        })
 
     return render(request, 'members/form.html')
+
+
+def activate_account(request, token):
+    try:
+        member_id = signer.unsign(token, max_age=60*60*24)
+        member = Member.objects.get(id=member_id)
+
+        if not member.is_activated:
+            member.is_activated = True
+            member.save()
+
+        return render(request, 'members/activation_success.html')
+
+    except SignatureExpired:
+        try:
+            unsigned_data = signer.unsign(token)  
+            member_id = int(unsigned_data)
+            Member.objects.filter(id=member_id, is_activated=False).delete()
+        except Exception:
+            pass
+        return render(request, 'members/activation_failed.html')
+
+    except (BadSignature, Member.DoesNotExist):
+        try:
+            unsigned_data = signer.unsign(token)
+            member_id = int(unsigned_data)
+            Member.objects.filter(id=member_id, is_activated=False).delete()
+        except Exception:
+            pass
+        return render(request, 'members/activation_failed.html')

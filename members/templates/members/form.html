@@ -12,6 +12,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FITRA | Online Coaching</title>
     <link rel="icon" type="image/png" href="./img/logo-H.png">
+     <!-- English Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Merienda:wght@300..900&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <!-- Arabic Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
+
     <!-- Load Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -29,7 +35,9 @@
                 }
             }
         }
+
     </script>
+
     <style>
         /* Define Inter font for clarity */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -141,6 +149,7 @@
     </style>
 </head>
 <body class="p-4 md:p-8 text-gray-100">
+    
     <!-- Main Form Container: Uses the updated dark gray color with opacity -->
     <div class="max-w-4xl mx-auto bg-form-dark-bg p-6 md:p-10 shadow-2xl rounded-xl border border-second-fitra/50">
         
@@ -583,4 +592,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 </body>
+    {% if alert_message %}
+        <script>
+            alert("{{ alert_message }}");
+        </script>
+    {% endif %}
 </html>
