@@ -55,6 +55,10 @@ class MemberAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(is_activated=True)
+
 # -----------------------
 # Governorate Admin
 # -----------------------

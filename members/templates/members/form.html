@@ -159,7 +159,7 @@
             <p class="text-xl text-gray-400 font-semibold">{% translate 'Registration Form' %}</p>
         </header>
 
-        <form id="fitra-form" class="space-y-8" method="POST" enctype="multipart/form-data">
+        <form id="fitra-form" action="{% url 'members:register' %}" class="space-y-8" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- Core Personal Data Section: Using the slightly lighter dark gray color -->
@@ -537,7 +537,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageBox = document.getElementById('message-box');
     const phoneInput = document.getElementById('phone');
 
-    // Toggle gender-specific fields
+    /* --------------------------------------------------------
+       Toggle Gender Fields
+    -------------------------------------------------------- */
     function toggleGenderFields() {
         maleSection.classList.add('hidden');
         femaleSection.classList.add('hidden');
@@ -557,42 +559,48 @@ document.addEventListener('DOMContentLoaded', () => {
     femaleRadio.addEventListener('change', toggleGenderFields);
     toggleGenderFields();
 
-    // Clear form button
+    /* --------------------------------------------------------
+       Clear Form Button
+    -------------------------------------------------------- */
     clearBtn.addEventListener('click', () => {
         form.reset();
         toggleGenderFields();
         messageBox.textContent = "Form has been cleared.";
         messageBox.classList.remove('hidden');
-        setTimeout(() => messageBox.classList.add('hidden'), 3000);
+
+        setTimeout(() => {
+            messageBox.classList.add('hidden');
+        }, 3000);
     });
 
-    // Form submission
+    /* --------------------------------------------------------
+       Form Validation + Submit
+    -------------------------------------------------------- */
     form.addEventListener('submit', (event) => {
         const phoneNumber = phoneInput ? phoneInput.value.trim() : "";
-        
+
         // Validate phone number
         if (phoneNumber && !phoneNumber.startsWith('01')) {
             event.preventDefault();
             messageBox.textContent = "Phone number must start with '01'.";
             messageBox.classList.remove('hidden');
             phoneInput.focus();
-            setTimeout(() => messageBox.classList.add('hidden'), 3000);
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+
             return; // stop submission
         }
 
-        // If all validations pass, show success message after a small delay
-        setTimeout(() => {
-            messageBox.textContent = "Form submitted successfully! Thank you.";
-            messageBox.classList.remove('hidden');
-            setTimeout(() => messageBox.classList.add('hidden'), 3000);
-        }, 100);
     });
 });
 </script>
 
 
+
 </body>
-    {% if alert_message %}
+ {% if alert_message %}
         <script>
             alert("{{ alert_message }}");
         </script>
