@@ -6,6 +6,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from .models import Member, Picture, Governorate, Goals, HearAboutUs
+from datetime import date
 
 signer = TimestampSigner()
 
@@ -20,24 +21,33 @@ def register(request):
             email = data.get("email")
 
             if email:
-                existing_member = Member.objects.filter(
+                # Check if there's already an activated account with this email
+                activated_exists = Member.objects.filter(
                     email=email,
                     is_activated=True
-                ).first()
+                ).exists()
 
-                if existing_member:
+                if activated_exists:
+                    form.add_error('email', 'هذا البريد الإلكتروني مستخدم بالفعل. الرجاء استخدام بريد آخر.' if request.LANGUAGE_CODE == 'ar' else 'This email is already in use. Please use another email.')
                     return render(
                         request,
                         "members/form.html",
                         {
                             "form": form,
-                            "alert_message": "هذا البريد الإلكتروني مستخدم بالفعل. الرجاء استخدام بريد آخر."
+                            "today": date.today()
                         },
                     )
+
+                # Delete any pending (unactivated) registrations with the same email
+                # to avoid UNIQUE constraint violations on re-registration
+                Member.objects.filter(email=email, is_activated=False).delete()
 
             governorate, _ = Governorate.objects.get_or_create(
                 governorate_name=data["place_of_living"]
             )
+
+            # Get the current language from the request
+            current_language = request.LANGUAGE_CODE
 
             member_info = Member.objects.create(
                 name=data["full_name"],
@@ -66,6 +76,7 @@ def register(request):
                 previous_gym=data["gym_before"],
                 confidence=data["confidence"],
                 comeback=data["return_continuity"],
+                preferred_language=current_language,  # Save the current language
             )
 
             Goals.objects.bulk_create([
@@ -97,13 +108,14 @@ def register(request):
                 )
             )
 
-            subject = "تفعيل حسابك في Fitra"
+            subject = "تفعيل حسابك في Fitra" if current_language == 'ar' else "Activate Your Fitra Account"
 
             message = render_to_string(
                 "members/activation_email.html",
                 {
                     "name": data["full_name"],
                     "activation_link": activation_link,
+                    "language": current_language,
                 },
             )
 
@@ -116,12 +128,16 @@ def register(request):
                     html_message=message,
                 )
 
+            # Success message for alert
+            success_message = "تحقق من بريدك الإلكتروني لتفعيل الحساب." if current_language == 'ar' else "Check your email to activate your account."
+            
             return render(
                 request,
                 "members/form.html",
                 {
                     "form": RegistrationForm(),
-                    "alert_message": "تحقق من بريدك الإلكتروني لتفعيل الحساب.",
+                    "success_message": success_message,
+                    "today": date.today()
                 },
             )
 
@@ -130,6 +146,7 @@ def register(request):
             "members/form.html",
             {
                 "form": form,
+                "today": date.today()
             },
         )
 
@@ -138,6 +155,7 @@ def register(request):
         "members/form.html",
         {
             "form": RegistrationForm(),
+            "today": date.today()
         },
     )
 
@@ -150,22 +168,27 @@ def activate_account(request, token):
             member.is_activated = True
             member.save()
 
-        return render(request, 'members/activation_success.html')
+        # Pass the member's preferred language to the template
+        return render(request, 'members/activation_success.html', {'member': member})
 
     except SignatureExpired:
         try:
             unsigned_data = signer.unsign(token)  
             member_id = int(unsigned_data)
-            Member.objects.filter(id=member_id, is_activated=False).delete()
+            member = Member.objects.filter(id=member_id, is_activated=False).first()
+            preferred_language = member.preferred_language if member else 'en'
+            member.delete() if member else None
         except Exception:
-            pass
-        return render(request, 'members/activation_failed.html')
+            preferred_language = 'en'
+        return render(request, 'members/activation_failed.html', {'preferred_language': preferred_language})
 
     except (BadSignature, Member.DoesNotExist):
         try:
             unsigned_data = signer.unsign(token)
             member_id = int(unsigned_data)
-            Member.objects.filter(id=member_id, is_activated=False).delete()
+            member = Member.objects.filter(id=member_id, is_activated=False).first()
+            preferred_language = member.preferred_language if member else 'en'
+            member.delete() if member else None
         except Exception:
-            pass
-        return render(request, 'members/activation_failed.html')
+            preferred_language = 'en'
+        return render(request, 'members/activation_failed.html', {'preferred_language': preferred_language})

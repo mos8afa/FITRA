@@ -18,6 +18,9 @@
     <!-- Arabic Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
 
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- Load Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -146,9 +149,88 @@
         -moz-appearance: textfield;
         }
 
+        /* Error Styles */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .error-message i {
+            font-size: 0.875rem;
+        }
+        
+        .is-invalid {
+            border-color: #ff6b6b !important;
+            border-width: 2px !important;
+        }
+        
+        .is-invalid:focus {
+            ring-color: rgba(255, 107, 107, 0.5) !important;
+            border-color: #ff6b6b !important;
+        }
+        
+        .non-field-errors {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        
+        .non-field-errors ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .non-field-errors li {
+            color: #ff6b6b;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
     </style>
 </head>
 <body class="p-4 md:p-8 text-gray-100">
+    
+    <!-- Navigation Buttons: Home & Language Switcher -->
+    <div class="max-w-4xl mx-auto mb-4 flex justify-between items-center gap-3">
+        <!-- Home Button -->
+        <a href="{% url 'home:home' %}" class="flex items-center gap-2 bg-main-fitra hover:bg-second-fitra text-black font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:text-white">
+            <i class="fas fa-home"></i>
+            <span>{% translate "Home" %}</span>
+        </a>
+
+        <!-- Language Switcher Button -->
+        {% get_current_language as LANGUAGE_CODE %}
+        {% if LANGUAGE_CODE == "en" %}
+            <a href="#" onclick="event.preventDefault(); document.getElementById('lang-ar-form').submit();" class="flex items-center gap-2 bg-main-fitra hover:bg-second-fitra text-black font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:text-white">
+                <i class="fas fa-language"></i>
+                <span>العربية</span>
+            </a>
+            <form id="lang-ar-form" action="{% url 'set_language' %}" method="post" style="display:none;">
+                {% csrf_token %}
+                <input type="hidden" name="language" value="ar">
+                <input type="hidden" name="next" value="{{ request.path }}">
+            </form>
+        {% elif LANGUAGE_CODE == "ar" %}
+            <a href="#" onclick="event.preventDefault(); document.getElementById('lang-en-form').submit();" class="flex items-center gap-2 bg-main-fitra hover:bg-second-fitra text-black font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:text-white">
+                <i class="fas fa-language"></i>
+                <span>English</span>
+            </a>
+            <form id="lang-en-form" action="{% url 'set_language' %}" method="post" style="display:none;">
+                {% csrf_token %}
+                <input type="hidden" name="language" value="en">
+                <input type="hidden" name="next" value="{{ request.path }}">
+            </form>
+        {% endif %}
+    </div>
     
     <!-- Main Form Container: Uses the updated dark gray color with opacity -->
     <div class="max-w-4xl mx-auto bg-form-dark-bg p-6 md:p-10 shadow-2xl rounded-xl border border-second-fitra/50">
@@ -158,6 +240,20 @@
             <h1 class="text-3xl md:text-4xl font-extrabold text-main-fitra mb-2">FITRA Membership</h1>
             <p class="text-xl text-gray-400 font-semibold">{% translate 'Registration Form' %}</p>
         </header>
+
+        <!-- Non-field Errors (General Form Errors) -->
+        {% if form.non_field_errors %}
+        <div class="non-field-errors">
+            <ul>
+                {% for error in form.non_field_errors %}
+                <li>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ error }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
 
         <form id="fitra-form" action="{% url 'members:register' %}" class="space-y-8" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -169,19 +265,43 @@
                 <!-- Full Name -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="full_name"><span class="required-label">{% translate 'Full Name' %}</span></label>
-                    <input type="text" id="full_name" name="full_name" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your full name" maxlength='60'>
+                    <input type="text" id="full_name" name="full_name" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.full_name.errors %}is-invalid{% endif %}" placeholder="Enter your full name" maxlength='60' value="{{ form.full_name.value|default:'' }}">
+                    {% if form.full_name.errors %}
+                        {% for error in form.full_name.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Age & Height -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="age"><span class="required-label">{% translate 'Age' %}</span></label>
-                        <input type="number" id="age" name="age" min="10" max="100" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your age (number)">
+                        <input type="number" id="age" name="age" min="10" max="100" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.age.errors %}is-invalid{% endif %}" placeholder="Enter your age (number)" value="{{ form.age.value|default:'' }}">
+                        {% if form.age.errors %}
+                            {% for error in form.age.errors %}
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="height"><span class="required-label">{% translate 'Height (CM)' %}</span></label>
-                        <input type="number" id="height" name="height" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your height in CM" min='0' max='299.99' step='0.01'>
+                        <input type="number" id="height" name="height" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.height.errors %}is-invalid{% endif %}" placeholder="Enter your height in CM" min='0' max='299.99' step='0.01' value="{{ form.height.value|default:'' }}">
+                        {% if form.height.errors %}
+                            {% for error in form.height.errors %}
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
 
@@ -189,12 +309,28 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="current_weight"><span class="required-label">{% translate 'Current Weight (KG)' %}</span></label>
-                        <input type="number" id="current_weight" name="current_weight" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Enter your current weight in KG" min="0" max='299.99' step='0.01'>
+                        <input type="number" id="current_weight" name="current_weight" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.current_weight.errors %}is-invalid{% endif %}" placeholder="Enter your current weight in KG" min="0" max='299.99' step='0.01' value="{{ form.current_weight.value|default:'' }}">
+                        {% if form.current_weight.errors %}
+                            {% for error in form.current_weight.errors %}
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-lg font-medium mb-2" for="measurement_date"><span class="required-label">{% translate 'Weight Measurement Date' %}</span></label>
-                        <input type="date" id="measurement_date" name="measurement_date" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150"value="{{ today|date:"Y-m-d" }}">
+                        <input type="date" id="measurement_date" name="measurement_date" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.measurement_date.errors %}is-invalid{% endif %}" value="{% if form.measurement_date.value %}{{ form.measurement_date.value|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}">
+                        {% if form.measurement_date.errors %}
+                            {% for error in form.measurement_date.errors %}
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
                 
@@ -203,14 +339,22 @@
                     <label class="block text-lg font-medium mb-2"><span class="required-label">{% translate 'Gender' %}</span></label>
                     <div class="flex flex-wrap gap-4">
                         <div>
-                            <input type="radio" id="gender-male" name="gender" value="MALE" required class="custom-radio-input">
+                            <input type="radio" id="gender-male" name="gender" value="MALE" required class="custom-radio-input" {% if form.gender.value == 'MALE' %}checked{% endif %}>
                             <label for="gender-male" class="custom-label">{% translate "Male" %}</label>
                         </div>
                         <div>
-                            <input type="radio" id="gender-female" name="gender" value="FEMALE" required class="custom-radio-input">
+                            <input type="radio" id="gender-female" name="gender" value="FEMALE" required class="custom-radio-input" {% if form.gender.value == 'FEMALE' %}checked{% endif %}>
                             <label for="gender-female" class="custom-label">{% translate 'Female' %}</label>
                         </div>
                     </div>
+                    {% if form.gender.errors %}
+                        {% for error in form.gender.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- **Conditional Section - 1: Male Photos** -->
@@ -233,50 +377,74 @@
                         <span class="required-label">{% translate "If you are a female, send your Circumferential measurements by measuring tape" %}</span>
                     </label>
                     <p class="text-sm text-gray-300 mb-3">{% translate 'Right and Left (Arms & Thighs) - Waist - Belly from level of umbilicus - Chest' %}</p>
-                    <textarea id="female_measurements" name="female_measurements" rows="4" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-second-fitra focus:ring focus:ring-second-fitra/50 transition duration-150" placeholder="Enter measurements here. Example: (Right Arm: 30 cm, Waist: 70 cm, Chest: 95 cm...)"></textarea>
+                    <textarea id="female_measurements" name="female_measurements" rows="4" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-second-fitra focus:ring focus:ring-second-fitra/50 transition duration-150 {% if form.female_measurements.errors %}is-invalid{% endif %}" placeholder="Enter measurements here. Example: (Right Arm: 30 cm, Waist: 70 cm, Chest: 95 cm...)">{{ form.female_measurements.value|default:'' }}</textarea>
+                    {% if form.female_measurements.errors %}
+                        {% for error in form.female_measurements.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 
                 <!-- Occupation or academic year -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="occupation"><span class="required-label">{% translate "Occupation or Academic Year" %}</span></label>
-                    <input type="text" id="occupation" name="occupation" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="e.g., Engineer, 4th Year Science" maxlength="150">
+                    <input type="text" id="occupation" name="occupation" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.occupation.errors %}is-invalid{% endif %}" placeholder="e.g., Engineer, 4th Year Science" maxlength="150" value="{{ form.occupation.value|default:'' }}">
+                    {% if form.occupation.errors %}
+                        {% for error in form.occupation.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 
                 <!-- Place of living (Egypt Governorates) -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="place_of_living"><span class="required-label">{% translate 'Place of Living' %}</span></label>
-                    <select id="place_of_living" name="place_of_living" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150">
-                        <option value="" disabled selected>{% translate "Choose Governorate" %}</option>
+                    <select id="place_of_living" name="place_of_living" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.place_of_living.errors %}is-invalid{% endif %}">
+                        <option value="" disabled {% if not form.place_of_living.value %}selected{% endif %}>{% translate "Choose Governorate" %}</option>
                         <!-- Egypt Governorates in English, Alphabetical Order -->
-                        <option value="Alexandria">{% translate "Alexandria" %}</option>
-                        <option value="Aswan">{% translate "Aswan" %}</option>
-                        <option value="Asyut">{% translate "Asyut" %}</option>
-                        <option value="Beheira">{% translate "Beheira" %}</option>
-                        <option value="Beni Suef">{% translate "Beni Suef" %}</option>
-                        <option value="Cairo">{% translate "Cairo" %}</option>
-                        <option value="Dakahlia">{% translate "Dakahlia" %}</option>
-                        <option value="Damietta">{% translate "Damietta" %}</option>
-                        <option value="Faiyum">{% translate "Faiyum" %}</option>
-                        <option value="Gharbia">{% translate "Gharbia" %}</option>
-                        <option value="Giza">{% translate "Giza" %}</option>
-                        <option value="Ismailia">{% translate "Ismailia" %}</option>
-                        <option value="Kafr El Sheikh">{% translate "Kafr El Sheikh" %}</option>
-                        <option value="Luxor">{% translate "Luxor" %}</option>
-                        <option value="Matruh">{% translate "Matruh" %}</option>
-                        <option value="Minya">{% translate "Minya" %}</option>
-                        <option value="Monufia">{% translate "Monufia" %}</option>
-                        <option value="New Valley">{% translate "New Valley (Wadi El Gedid)" %}</option>
-                        <option value="North Sinai">{% translate "North Sinai" %}</option>
-                        <option value="Port Said">{% translate "Port Said" %}</option>
-                        <option value="Qalyubia">{% translate "Qalyubia" %}</option>
-                        <option value="Qena">{% translate "Qena" %}</option>
-                        <option value="Red Sea">{% translate "Red Sea" %}</option>
-                        <option value="Sharqia">{% translate "Sharqia" %}</option>
-                        <option value="Sohag">{% translate "Sohag" %}</option>
-                        <option value="South Sinai">{% translate "South Sinai" %}</option>
-                        <option value="Suez">{% translate "Suez" %}</option>
+                        <option value="Alexandria" {% if form.place_of_living.value == 'Alexandria' %}selected{% endif %}>{% translate "Alexandria" %}</option>
+                        <option value="Aswan" {% if form.place_of_living.value == 'Aswan' %}selected{% endif %}>{% translate "Aswan" %}</option>
+                        <option value="Asyut" {% if form.place_of_living.value == 'Asyut' %}selected{% endif %}>{% translate "Asyut" %}</option>
+                        <option value="Beheira" {% if form.place_of_living.value == 'Beheira' %}selected{% endif %}>{% translate "Beheira" %}</option>
+                        <option value="Beni Suef" {% if form.place_of_living.value == 'Beni Suef' %}selected{% endif %}>{% translate "Beni Suef" %}</option>
+                        <option value="Cairo" {% if form.place_of_living.value == 'Cairo' %}selected{% endif %}>{% translate "Cairo" %}</option>
+                        <option value="Dakahlia" {% if form.place_of_living.value == 'Dakahlia' %}selected{% endif %}>{% translate "Dakahlia" %}</option>
+                        <option value="Damietta" {% if form.place_of_living.value == 'Damietta' %}selected{% endif %}>{% translate "Damietta" %}</option>
+                        <option value="Faiyum" {% if form.place_of_living.value == 'Faiyum' %}selected{% endif %}>{% translate "Faiyum" %}</option>
+                        <option value="Gharbia" {% if form.place_of_living.value == 'Gharbia' %}selected{% endif %}>{% translate "Gharbia" %}</option>
+                        <option value="Giza" {% if form.place_of_living.value == 'Giza' %}selected{% endif %}>{% translate "Giza" %}</option>
+                        <option value="Ismailia" {% if form.place_of_living.value == 'Ismailia' %}selected{% endif %}>{% translate "Ismailia" %}</option>
+                        <option value="Kafr El Sheikh" {% if form.place_of_living.value == 'Kafr El Sheikh' %}selected{% endif %}>{% translate "Kafr El Sheikh" %}</option>
+                        <option value="Luxor" {% if form.place_of_living.value == 'Luxor' %}selected{% endif %}>{% translate "Luxor" %}</option>
+                        <option value="Matruh" {% if form.place_of_living.value == 'Matruh' %}selected{% endif %}>{% translate "Matruh" %}</option>
+                        <option value="Minya" {% if form.place_of_living.value == 'Minya' %}selected{% endif %}>{% translate "Minya" %}</option>
+                        <option value="Monufia" {% if form.place_of_living.value == 'Monufia' %}selected{% endif %}>{% translate "Monufia" %}</option>
+                        <option value="New Valley" {% if form.place_of_living.value == 'New Valley' %}selected{% endif %}>{% translate "New Valley (Wadi El Gedid)" %}</option>
+                        <option value="North Sinai" {% if form.place_of_living.value == 'North Sinai' %}selected{% endif %}>{% translate "North Sinai" %}</option>
+                        <option value="Port Said" {% if form.place_of_living.value == 'Port Said' %}selected{% endif %}>{% translate "Port Said" %}</option>
+                        <option value="Qalyubia" {% if form.place_of_living.value == 'Qalyubia' %}selected{% endif %}>{% translate "Qalyubia" %}</option>
+                        <option value="Qena" {% if form.place_of_living.value == 'Qena' %}selected{% endif %}>{% translate "Qena" %}</option>
+                        <option value="Red Sea" {% if form.place_of_living.value == 'Red Sea' %}selected{% endif %}>{% translate "Red Sea" %}</option>
+                        <option value="Sharqia" {% if form.place_of_living.value == 'Sharqia' %}selected{% endif %}>{% translate "Sharqia" %}</option>
+                        <option value="Sohag" {% if form.place_of_living.value == 'Sohag' %}selected{% endif %}>{% translate "Sohag" %}</option>
+                        <option value="South Sinai" {% if form.place_of_living.value == 'South Sinai' %}selected{% endif %}>{% translate "South Sinai" %}</option>
+                        <option value="Suez" {% if form.place_of_living.value == 'Suez' %}selected{% endif %}>{% translate "Suez" %}</option>
 
                     </select>
+                    {% if form.place_of_living.errors %}
+                        {% for error in form.place_of_living.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
             </section>
@@ -288,20 +456,36 @@
                 <!-- Phone number (with Whatsapp) - **Validation added to ensure it starts with 01** -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="phone"><span class="required-label">{% translate 'Phone Number (with WhatsApp)' %}</span></label>
-                    <input type="tel" id="phone" name="phone" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="e.g., 01XXXXXXXXX" maxlength="13">
+                    <input type="tel" id="phone" name="phone" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.phone.errors %}is-invalid{% endif %}" placeholder="e.g., 01XXXXXXXXX" maxlength="13" value="{{ form.phone.value|default:'' }}">
                     <p class="text-sm text-gray-400 mt-1">{% translate 'Must start with 01' %}</p>
+                    {% if form.phone.errors %}
+                        {% for error in form.phone.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Email -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="email">{% translate 'Email (Optional)' %}</label>
-                    <input type="email" id="email" name="email" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Your answer">
+                    <input type="email" id="email" name="email" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.email.errors %}is-invalid{% endif %}" placeholder="Your answer" value="{{ form.email.value|default:'' }}">
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- (Optional) Telegram user -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="telegram_user">{% translate 'Telegram User (Optional)' %}</label>
-                    <input type="text" id="telegram_user" name="telegram_user" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Like @example" maxlength="50">
+                    <input type="text" id="telegram_user" name="telegram_user" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="Like @example" maxlength="50" value="{{ form.telegram_user.value|default:'' }}">
                 </div>
             </section>
 
@@ -315,34 +499,42 @@
                     <p class="text-sm text-main-fitra mb-3 font-semibold">{% translate "You can choose more than one goal" %}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-fatloss" name="fitness_goal" value="FAT LOSS" class="custom-checkbox-input" required>
+                            <input type="checkbox" id="goal-fatloss" name="fitness_goal" value="FAT LOSS" class="custom-checkbox-input" required {% if 'FAT LOSS' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-fatloss" class="custom-label w-full">{% translate "Fat Loss" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-muscle" name="fitness_goal" value="INCREASE MUSCLE MASS" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-muscle" name="fitness_goal" value="INCREASE MUSCLE MASS" class="custom-checkbox-input" {% if 'INCREASE MUSCLE MASS' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-muscle" class="custom-label w-full">{% translate "Increase Muscle Mass" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-strength" name="fitness_goal" value="INCREASE STRENTH" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-strength" name="fitness_goal" value="INCREASE STRENTH" class="custom-checkbox-input" {% if 'INCREASE STRENTH' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-strength" class="custom-label w-full">{% translate "Increase Strength" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-endurance" name="fitness_goal" value="INCREASE ENDURANCE" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-endurance" name="fitness_goal" value="INCREASE ENDURANCE" class="custom-checkbox-input" {% if 'INCREASE ENDURANCE' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-endurance" class="custom-label w-full">{% translate "Increase Endurance" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-functional" name="fitness_goal" value="TRAIN FOR FUNCTIONALITY" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-functional" name="fitness_goal" value="TRAIN FOR FUNCTIONALITY" class="custom-checkbox-input" {% if 'TRAIN FOR FUNCTIONALITY' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-functional" class="custom-label w-full">{% translate "Train for Functionality" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-fun" name="fitness_goal" value="HAVING FUN" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-fun" name="fitness_goal" value="HAVING FUN" class="custom-checkbox-input" {% if 'HAVING FUN' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-fun" class="custom-label w-full">{% translate "Having Fun and Avoid Routine Stress" %}</label>
                         </div>
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-rehab" name="fitness_goal" value="POST REHABILITATION STRENTH" class="custom-checkbox-input">
+                            <input type="checkbox" id="goal-rehab" name="fitness_goal" value="POST REHABILITATION STRENTH" class="custom-checkbox-input" {% if 'POST REHABILITATION STRENTH' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-rehab" class="custom-label w-full">{% translate "Post Rehabilitation Strength" %}</label>
                         </div>
                     </div>
+                    {% if form.fitness_goal.errors %}
+                        {% for error in form.fitness_goal.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 
@@ -407,13 +599,29 @@
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="habit"><span class="required-label">{% translate "Do you have any daily or weekly habit (good or bad)?" %}</span></label>
                     <p class="text-sm text-gray-400 mb-3">{% translate "Example: (weekly football match - Go to work walking on foot - smoking)" %}</p>
-                    <textarea id="habit" name="habit" rows="3" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="{% translate 'Your answer' %}"></textarea>
+                    <textarea id="habit" name="habit" rows="3" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.habit.errors %}is-invalid{% endif %}" placeholder="{% translate 'Your answer' %}">{{ form.habit.value|default:'' }}</textarea>
+                    {% if form.habit.errors %}
+                        {% for error in form.habit.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Nutrition in the past -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="past_nutrition"><span class="required-label">{% translate "Tell me about your nutrition in the past 6-3 months (How many meals, type of food)" %}</span></label>
-                    <textarea id="past_nutrition" name="past_nutrition" rows="4" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="{% translate 'Your answer' %}"></textarea>
+                    <textarea id="past_nutrition" name="past_nutrition" rows="4" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.past_nutrition.errors %}is-invalid{% endif %}" placeholder="{% translate 'Your answer' %}">{{ form.past_nutrition.value|default:'' }}</textarea>
+                    {% if form.past_nutrition.errors %}
+                        {% for error in form.past_nutrition.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Your Plan -->
@@ -429,13 +637,21 @@
                 <!-- Illness or injury -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="illness"><span class="required-label">{% translate "Do you suffer from any illness or injury that affects your performance (If Yes explain)" %}</span></label>
-                    <textarea id="illness" name="illness" rows="3" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="{% translate 'Your answer' %}"></textarea>
+                    <textarea id="illness" name="illness" rows="3" required class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150 {% if form.illness.errors %}is-invalid{% endif %}" placeholder="{% translate 'Your answer' %}">{{ form.illness.value|default:'' }}</textarea>
+                    {% if form.illness.errors %}
+                        {% for error in form.illness.errors %}
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ error }}</span>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
 
                 <!-- Play Any Sports Besides the gym -->
                 <div class="mb-6">
                     <label class="block text-lg font-medium mb-2" for="other_sports">{% translate "Do You Play Any Sports Besides the gym (If Yes explain)" %}</label>
-                    <textarea id="other_sports" name="other_sports" rows="3" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="{% translate 'Your answer (Optional)' %}"></textarea>
+                    <textarea id="other_sports" name="other_sports" rows="3" class="w-full p-3 border-2 border-gray-600 rounded-lg focus:border-main-fitra focus:ring focus:ring-main-fitra/50 transition duration-150" placeholder="{% translate 'Your answer (Optional)' %}">{{ form.other_sports.value|default:'' }}</textarea>
                 </div>
 
                 <!-- Commitment Section -->
@@ -541,6 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
        Toggle Gender Fields
     -------------------------------------------------------- */
     function toggleGenderFields() {
+        // Hide both sections and remove required attributes
         maleSection.classList.add('hidden');
         femaleSection.classList.add('hidden');
         malePhotosInput.removeAttribute('required');
@@ -548,16 +765,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (maleRadio.checked) {
             maleSection.classList.remove('hidden');
-            malePhotosInput.setAttribute('required', 'required');
+            // Don't add required attribute - we'll handle validation in JS
+            // malePhotosInput.setAttribute('required', 'required');
         } else if (femaleRadio.checked) {
             femaleSection.classList.remove('hidden');
-            femaleMeasurementsInput.setAttribute('required', 'required');
+            // Don't add required attribute - we'll handle validation in JS
+            // femaleMeasurementsInput.setAttribute('required', 'required');
         }
     }
 
     maleRadio.addEventListener('change', toggleGenderFields);
     femaleRadio.addEventListener('change', toggleGenderFields);
     toggleGenderFields();
+
+    /* --------------------------------------------------------
+       Restore Form Values from Server (After Validation Errors)
+    -------------------------------------------------------- */
+    
+    // Restore radio button: gender
+    {% if form.gender.value %}
+    const genderValue = '{{ form.gender.value }}';
+    if (genderValue) {
+        const genderRadio = document.querySelector(`input[name="gender"][value="${genderValue}"]`);
+        if (genderRadio) {
+            genderRadio.checked = true;
+            toggleGenderFields();
+        }
+    }
+    {% endif %}
+
+    // Restore checkboxes: fitness_goal
+    {% if form.fitness_goal.value %}
+    const fitnessGoals = [{% for goal in form.fitness_goal.value %}'{{ goal }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    fitnessGoals.forEach(goal => {
+        const checkbox = document.querySelector(`input[name="fitness_goal"][value="${goal}"]`);
+        if (checkbox) checkbox.checked = true;
+    });
+    {% endif %}
+
+    // Restore radio button: meals_per_day
+    {% if form.meals_per_day.value %}
+    const mealsRadio = document.querySelector(`input[name="meals_per_day"][value="{{ form.meals_per_day.value }}"]`);
+    if (mealsRadio) mealsRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: food_budget
+    {% if form.food_budget.value %}
+    const budgetRadio = document.querySelector(`input[name="food_budget"][value="{{ form.food_budget.value }}"]`);
+    if (budgetRadio) budgetRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: measuring_scale
+    {% if form.measuring_scale.value %}
+    const scaleRadio = document.querySelector(`input[name="measuring_scale"][value="{{ form.measuring_scale.value }}"]`);
+    if (scaleRadio) scaleRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: workout_days
+    {% if form.workout_days.value %}
+    const daysRadio = document.querySelector(`input[name="workout_days"][value="{{ form.workout_days.value }}"]`);
+    if (daysRadio) daysRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: training_location
+    {% if form.training_location.value %}
+    const locationRadio = document.querySelector(`input[name="training_location"][value="{{ form.training_location.value }}"]`);
+    if (locationRadio) locationRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: plan_type
+    {% if form.plan_type.value %}
+    const planRadio = document.querySelector(`input[name="plan_type"][value="{{ form.plan_type.value }}"]`);
+    if (planRadio) planRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: gym_before
+    {% if form.gym_before.value %}
+    const gymRadio = document.querySelector(`input[name="gym_before"][value="{{ form.gym_before.value }}"]`);
+    if (gymRadio) gymRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: confidence
+    {% if form.confidence.value %}
+    const confidenceRadio = document.querySelector(`input[name="confidence"][value="{{ form.confidence.value }}"]`);
+    if (confidenceRadio) confidenceRadio.checked = true;
+    {% endif %}
+
+    // Restore radio button: return_continuity
+    {% if form.return_continuity.value %}
+    const returnRadio = document.querySelector(`input[name="return_continuity"][value="{{ form.return_continuity.value }}"]`);
+    if (returnRadio) returnRadio.checked = true;
+    {% endif %}
+
+    // Restore checkboxes: how_hear
+    {% if form.how_hear.value %}
+    const howHearSources = [{% for source in form.how_hear.value %}'{{ source }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+    howHearSources.forEach(source => {
+        const checkbox = document.querySelector(`input[name="how_hear"][value="${source}"]`);
+        if (checkbox) checkbox.checked = true;
+    });
+    {% endif %}
+
+    // Restore radio button: recommendation_rating
+    {% if form.recommendation_rating.value %}
+    const ratingRadio = document.querySelector(`input[name="recommendation_rating"][value="{{ form.recommendation_rating.value }}"]`);
+    if (ratingRadio) ratingRadio.checked = true;
+    {% endif %}
 
     /* --------------------------------------------------------
        Clear Form Button
@@ -582,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Validate phone number
         if (phoneNumber && !phoneNumber.startsWith('01')) {
             event.preventDefault();
-            messageBox.textContent = "Phone number must start with '01'.";
+            messageBox.textContent = "{% translate 'Phone number must start with 01' %}";
             messageBox.classList.remove('hidden');
             phoneInput.focus();
 
@@ -593,7 +906,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // stop submission
         }
 
-        // If validation passes, allow form to submit normally
+        // Validate gender-specific fields
+        if (maleRadio.checked) {
+            const photos = malePhotosInput.files;
+            if (!photos || photos.length === 0) {
+                event.preventDefault();
+                messageBox.textContent = "{% translate 'Please upload the required photos (4 photos)' %}";
+                messageBox.classList.remove('hidden');
+                malePhotosInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 3000);
+
+                return; // stop submission
+            }
+        } else if (femaleRadio.checked) {
+            const measurements = femaleMeasurementsInput.value.trim();
+            if (!measurements) {
+                event.preventDefault();
+                messageBox.textContent = "{% translate 'Please enter your measurements' %}";
+                messageBox.classList.remove('hidden');
+                femaleMeasurementsInput.focus();
+
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 3000);
+
+                return; // stop submission
+            }
+        }
+
+        // If all validation passes, allow form to submit normally
         // No need for event.preventDefault() here
     });
 });
@@ -602,9 +946,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 </body>
- {% if alert_message %}
+ {% if success_message %}
         <script>
-            alert("{{ alert_message }}");
+            alert("{{ success_message }}");
         </script>
     {% endif %}
 </html>
