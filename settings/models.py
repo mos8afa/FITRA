@@ -1,27 +1,24 @@
 from django.db import models
+from solo.models import SingletonModel
 
-class Info(models.Model):
+class Info(SingletonModel):
     logo = models.ImageField(verbose_name = 'Logo', upload_to = 'settings/')
     slogan = models.CharField(verbose_name ='Slogan', max_length = 200 )
 
-class Brief(models.Model): 
-    home = models.OneToOneField(Info, on_delete = models.CASCADE, related_name = 'info_brief')   
+class Brief(SingletonModel): 
     brief_title = models.CharField(verbose_name ='Brief Title', max_length = 100 )
     brief_content = models.TextField(verbose_name ='Brief')
     brief_image = models.ImageField(verbose_name = 'Brief Image', upload_to ='settings/') 
 
-class AboutUs(models.Model):
-    home = models.OneToOneField(Info, on_delete = models.CASCADE, related_name = 'info_about_us')
+class AboutUs(SingletonModel):
     about_us_content =  models.TextField(verbose_name ='About Us')
     about_us_image = models.ImageField(verbose_name ='About US Image', upload_to='settings/')
 
-class Footer(models.Model):
-    home = models.OneToOneField(Info, on_delete = models.CASCADE, related_name = 'info_footer')
+class Footer(SingletonModel):
     footer_slogan = models.CharField(verbose_name ='Footer Slogan', max_length = 200 )
     footer_image = models.ImageField(verbose_name = 'Footer Image', upload_to ='settings/')
 
-class SocialLinks(models.Model):
-    home = models.OneToOneField(Info, on_delete = models.CASCADE, related_name = 'info_links')
+class SocialLinks(SingletonModel):
     youtube = models.URLField(verbose_name ='Youtube Link', max_length = 100, blank=True)  
     whatsapp = models.URLField(verbose_name ='Whatsapp Link', max_length = 100, blank=True)   
     facebook = models.URLField(verbose_name ='Facebook Link', max_length = 100, blank=True)
@@ -55,7 +52,4 @@ class Packadges(models.Model):
     image = models.ImageField(verbose_name ='Packadge Image', upload_to='settings/')
     advantages = models.ManyToManyField(PackadgeAdvantage, blank = True, null = True, related_name = 'packadge_pros')
     disadvantages = models.ManyToManyField(PackadgeDisadvantage, blank = True, null = True, related_name = 'packadge_cons')
-    
-
-    
 

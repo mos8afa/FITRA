@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'members',
     'django_summernote',
     'widget_tweaks',
+    'solo',
 ]
 
 MIDDLEWARE = [

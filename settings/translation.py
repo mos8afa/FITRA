@@ -24,3 +24,7 @@ class PackadgeDisadvantageTranslationOptions(TranslationOptions):
 @register(models.Packadges)
 class PackadgesTranslationOptions(TranslationOptions):
     fields = ('name','time',)
+
+@register(models.Footer)
+class FooterTranslationOptions(TranslationOptions):
+    fields = ('footer_slogan',)

@@ -2,14 +2,13 @@ from django.shortcuts import render
 from . import models 
 
 def home(request):
-    info = models.Info.objects.last()
-    brief = models.Brief.objects.last()
-    about_us = models.AboutUs.objects.last()
-    footer = models.Footer.objects.last()
-    social_links = models.SocialLinks.objects.last()
+    info = models.Info.get_solo()
+    brief = models.Brief.get_solo()
+    about_us = models.AboutUs.get_solo()
+    footer = models.Footer.get_solo()
+    social_links = models.SocialLinks.get_solo()
     successful_stories = models.SuccessfullStories.objects.all().order_by('-id')[:10]
     packadges = models.Packadges.objects.all()
-    
     slogan_words = footer.footer_slogan.split()
 
     words = slogan_words[:7]            
