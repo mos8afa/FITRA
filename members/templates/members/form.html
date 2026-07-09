@@ -593,6 +593,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return; // stop submission
         }
 
+        // If validation passes, allow form to submit normally
+        // No need for event.preventDefault() here
     });
 });
 </script>

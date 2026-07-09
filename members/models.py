@@ -136,7 +136,7 @@ class Member(models.Model):
     weight = models.DecimalField(verbose_name=_('Weight (kg)'), max_digits=5, decimal_places=2)
     weight_measure_date = models.DateField(verbose_name=_('Weight Measurement Date'), default= datetime.date.today)
     whatsapp_number = models.CharField(verbose_name=_('Whatsapp Number'), max_length=13)
-    email = models.EmailField(verbose_name=_('Email'))
+    email = models.EmailField(verbose_name=_('Email'),unique=True)
     telegram_username = models.CharField(verbose_name=_('Telegram Username'), max_length=50, blank=True, null=True)
     place = models.ForeignKey(Governorate,on_delete=models.PROTECT, related_name='user_governorate')
     gender = models.CharField(verbose_name=_('Gender'), max_length=6, choices=GENDER)
@@ -156,7 +156,6 @@ class Member(models.Model):
     habits = models.TextField(verbose_name=_('Any Habits'))
     confidence = models.CharField(verbose_name=_('Confidence'), max_length=10, choices=CONFIDENCE)
     comeback = models.CharField(verbose_name=_('Comeback'), max_length=10, choices=COMEBACK)
-    hear_about_us = models.CharField(verbose_name=_('How hear about us?'), max_length=10, choices=HEAR_ABOUT_US)
     is_activated = models.BooleanField(verbose_name=('IS Activated'), default=False)
     def __str__(self):
         return self.name
@@ -169,8 +168,19 @@ class Picture(models.Model):
     member = models.ForeignKey(Member,on_delete=models.CASCADE, related_name='user_images')
     images = models.ImageField(verbose_name=_('images'), upload_to='members/', null=True, blank=True)
 
+class HearAboutUs(models.Model):
+    member = models.ForeignKey(
+        Member,
+        on_delete=models.CASCADE,
+        related_name="hear_about_us"
+    )
 
-    
+    source = models.CharField(
+        max_length=20,
+        choices=HEAR_ABOUT_US
+    )
 
+    def __str__(self):
+        return f"{self.member.name} - {self.source}"
 
 

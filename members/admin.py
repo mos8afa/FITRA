@@ -1,7 +1,6 @@
 from django.utils.safestring import mark_safe
 from django.contrib import admin
-from .models import Governorate, Member, Goals, Picture
-
+from .models import Governorate, Member, Goals, Picture, HearAboutUs
 # -----------------------
 # Inline لعرض الأهداف
 # -----------------------
@@ -26,6 +25,13 @@ class PictureInline(admin.TabularInline):
         return "-"
     image_tag.short_description = 'Image'
 
+
+class HearAboutUsInline(admin.TabularInline):
+    model = HearAboutUs
+    extra = 0
+    readonly_fields = ("source",)
+    can_delete = True
+
 # -----------------------
 # Member Admin
 # -----------------------
@@ -36,7 +42,7 @@ class MemberAdmin(admin.ModelAdmin):
     search_fields = ('name', 'whatsapp_number', 'email', 'telegram_username')
     ordering = ('-join_date',)
     readonly_fields = ('join_date', 'weight_measure_date')
-    inlines = [GoalsInline, PictureInline]  
+    inlines = [GoalsInline, HearAboutUsInline, PictureInline]   
     fieldsets = (
         ('Personal Info', {
             'fields': ('name', 'age', 'gender', 'education', 'place', 'whatsapp_number', 'email', 'telegram_username')
@@ -51,7 +57,7 @@ class MemberAdmin(admin.ModelAdmin):
             'fields': ('before_nutrition', 'injuries', 'previous_gym', 'another_sports', 'habits')
         }),
         ('Motivation & Feedback', {
-            'fields': ('confidence', 'comeback', 'hear_about_us', 'recommend_us')
+            'fields': ('confidence', 'comeback', 'recommend_us')
         }),
     )
 
@@ -98,3 +104,13 @@ class PictureAdmin(admin.ModelAdmin):
             return mark_safe(f'<img src="{obj.images.url}" width="100" style="border-radius:8px;"/>')
         return "-"
     image_tag.short_description = 'Image'
+
+
+@admin.register(HearAboutUs)
+class HearAboutUsAdmin(admin.ModelAdmin):
+    list_display = ('member', 'source')
+    list_filter = ('source',)
+    search_fields = ('member__name',)
+
+    def has_module_permission(self, request):
+        return False
