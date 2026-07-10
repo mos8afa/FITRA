@@ -123,7 +123,7 @@ GOVERNORATE = [
 ]
 
 class Governorate(models.Model):
-    governorate_name = models.CharField(verbose_name=_('Governrate name'), max_length=30, choices=GOVERNORATE)
+    governorate_name = models.CharField(verbose_name=_('Governrate name'), max_length=30, choices=GOVERNORATE, unique=True)
     def __str__(self):
         return self.governorate_name
 

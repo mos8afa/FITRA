@@ -238,14 +238,18 @@ class RegistrationForm(forms.Form):
 
         if gender == 'MALE':
             photos = self.files.getlist('male_photos')
-            if not photos:
-                self.add_error(None, _('Please upload the required photos (4 photos).'))
+
+            if len(photos) < 4 or len(photos) > 5:
+                self.add_error(None, _('Please upload 4 or 5 photos.'))
             else:
+                total_size = 0
                 for photo in photos:
                     if not photo.content_type.startswith('image/'):
                         self.add_error(None, _('The file "%(filename)s" is not a valid image.') % {'filename': photo.name})
-                    if photo.size > 10 * 1024 * 1024:  # 10 MB
-                        self.add_error(None, _('The image "%(filename)s" is larger than 10 MB.') % {'filename': photo.name})
+                    total_size += photo.size
+
+                if total_size > 10 * 1024 * 1024:  # 10 MB combined
+                    self.add_error(None, _('The total size of all photos must not exceed 10 MB.'))
 
         elif gender == 'FEMALE':
             if not cleaned_data.get('female_measurements'):

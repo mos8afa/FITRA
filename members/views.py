@@ -7,10 +7,13 @@ from django.template.loader import render_to_string
 from django.core.signing import BadSignature, SignatureExpired, TimestampSigner
 from .models import Member, Picture, Governorate, Goals, HearAboutUs
 from datetime import date
+from django_ratelimit.decorators import ratelimit
+from django.db import transaction
 
 signer = TimestampSigner()
 
 
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
 def register(request):
     if request.method == "POST":
         form = RegistrationForm(request.POST, request.FILES)
@@ -21,7 +24,6 @@ def register(request):
             email = data.get("email")
 
             if email:
-                # Check if there's already an activated account with this email
                 activated_exists = Member.objects.filter(
                     email=email,
                     is_activated=True
@@ -38,66 +40,66 @@ def register(request):
                         },
                     )
 
-                # Delete any pending (unactivated) registrations with the same email
-                # to avoid UNIQUE constraint violations on re-registration
+                
                 Member.objects.filter(email=email, is_activated=False).delete()
 
-            governorate, _ = Governorate.objects.get_or_create(
-                governorate_name=data["place_of_living"]
-            )
-
-            # Get the current language from the request
-            current_language = request.LANGUAGE_CODE
-
-            member_info = Member.objects.create(
-                name=data["full_name"],
-                age=data["age"],
-                height=data["height"],
-                weight=data["current_weight"],
-                weight_measure_date=data["measurement_date"],
-                gender=data["gender"],
-                sizes=data.get("female_measurements", ""),
-                education=data["occupation"],
-                place=governorate,
-                whatsapp_number=data["phone"],
-                email=email,
-                telegram_username=data.get("telegram_user"),
-                plan=data["plan_type"],
-                recommend_us=data["recommendation_rating"],
-                meals_num=data["meals_per_day"],
-                daily_spend=data["food_budget"],
-                measure_scale=data["measuring_scale"],
-                workout_days=data["workout_days"],
-                training_type=data["training_location"],
-                habits=data["habit"],
-                before_nutrition=data["past_nutrition"],
-                injuries=data["illness"],
-                another_sports=data.get("other_sports"),
-                previous_gym=data["gym_before"],
-                confidence=data["confidence"],
-                comeback=data["return_continuity"],
-                preferred_language=current_language,  # Save the current language
-            )
-
-            Goals.objects.bulk_create([
-                Goals(member=member_info, goal=goal)
-                for goal in data["fitness_goal"]
-            ])
-
-            HearAboutUs.objects.bulk_create([
-                HearAboutUs(
-                    member=member_info,
-                    source=source
+            with transaction.atomic():                          
+                governorate, _ = Governorate.objects.get_or_create(
+                    governorate_name=data["place_of_living"]
                 )
-                for source in data["how_hear"]
-            ])
 
-            images = request.FILES.getlist("male_photos")
-            if images:
-                Picture.objects.bulk_create([
-                    Picture(member=member_info, images=image)
-                    for image in images
+                current_language = request.LANGUAGE_CODE
+
+                member_info = Member.objects.create(
+                    name=data["full_name"],
+                    age=data["age"],
+                    height=data["height"],
+                    weight=data["current_weight"],
+                    weight_measure_date=data["measurement_date"],
+                    gender=data["gender"],
+                    sizes=data.get("female_measurements", ""),
+                    education=data["occupation"],
+                    place=governorate,
+                    whatsapp_number=data["phone"],
+                    email=email,
+                    telegram_username=data.get("telegram_user"),
+                    plan=data["plan_type"],
+                    recommend_us=data["recommendation_rating"],
+                    meals_num=data["meals_per_day"],
+                    daily_spend=data["food_budget"],
+                    measure_scale=data["measuring_scale"],
+                    workout_days=data["workout_days"],
+                    training_type=data["training_location"],
+                    habits=data["habit"],
+                    before_nutrition=data["past_nutrition"],
+                    injuries=data["illness"],
+                    another_sports=data.get("other_sports"),
+                    previous_gym=data["gym_before"],
+                    confidence=data["confidence"],
+                    comeback=data["return_continuity"],
+                    preferred_language=current_language,  
+                )
+
+            
+                Goals.objects.bulk_create([
+                    Goals(member=member_info, goal=goal)
+                    for goal in data["fitness_goal"]
                 ])
+
+                HearAboutUs.objects.bulk_create([
+                    HearAboutUs(
+                        member=member_info,
+                        source=source
+                    )
+                    for source in data["how_hear"]
+                ])
+
+                images = request.FILES.getlist("male_photos")
+                if images:
+                    Picture.objects.bulk_create([
+                        Picture(member=member_info, images=image)
+                        for image in images
+                    ])
 
             token = signer.sign(member_info.id)
 
@@ -128,7 +130,6 @@ def register(request):
                     html_message=message,
                 )
 
-            # Success message for alert
             success_message = "تحقق من بريدك الإلكتروني لتفعيل الحساب." if current_language == 'ar' else "Check your email to activate your account."
             
             return render(
@@ -168,7 +169,6 @@ def activate_account(request, token):
             member.is_activated = True
             member.save()
 
-        # Pass the member's preferred language to the template
         return render(request, 'members/activation_success.html', {'member': member})
 
     except SignatureExpired:
@@ -192,3 +192,12 @@ def activate_account(request, token):
         except Exception:
             preferred_language = 'en'
         return render(request, 'members/activation_failed.html', {'preferred_language': preferred_language})
+
+
+def ratelimited_view(request, exception):
+    message = "لقد قمت بمحاولات كثيرة جداً. الرجاء المحاولة لاحقاً." if request.LANGUAGE_CODE == 'ar' else "Too many attempts. Please try again later."
+    return render(request, "members/form.html", {
+        "form": RegistrationForm(),
+        "error_message": message,
+        "today": date.today()
+    }, status=429)

@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+RATELIMIT_VIEW = 'members.views.ratelimited_view'
 
 # Application definition
 

@@ -258,6 +258,14 @@
         <form id="fitra-form" action="{% url 'members:register' %}" class="space-y-8" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
+                {% if error_message %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ error_message }}</span>
+                    </div>
+                {% endif %}
+                
+
             <!-- Core Personal Data Section: Using the slightly lighter dark gray color -->
             <section class="p-5 bg-section-dark-bg rounded-lg shadow-inner">
                 <h2 class="text-2xl font-bold text-main-fitra mb-6 border-b pb-2 border-gray-600">{% translate 'Personal Information' %}</h2>

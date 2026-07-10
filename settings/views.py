@@ -8,7 +8,7 @@ def home(request):
     footer = models.Footer.get_solo()
     social_links = models.SocialLinks.get_solo()
     successful_stories = models.SuccessfullStories.objects.all().order_by('-id')[:10]
-    packadges = models.Packadges.objects.all()
+    packadges = models.Packadges.objects.prefetch_related('advantages', 'disadvantages').all()
     slogan_words = footer.footer_slogan.split()
 
     words = slogan_words[:7]            
