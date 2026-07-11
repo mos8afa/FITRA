@@ -9,6 +9,8 @@ from .models import Member, Picture, Governorate, Goals, HearAboutUs
 from datetime import date
 from django_ratelimit.decorators import ratelimit
 from django.db import transaction
+import traceback
+
 
 signer = TimestampSigner()
 
@@ -121,16 +123,30 @@ def register(request):
                 },
             )
 
+            email_sent = False
+            email_error = None
+            
             if email:
-                send_mail(
-                    subject,
-                    "",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    html_message=message,
-                )
+                try:
+                    send_mail(
+                        subject,
+                        "",
+                        settings.DEFAULT_FROM_EMAIL,
+                        [email],
+                        html_message=message,
+                        fail_silently=False,
+                    )
+                    email_sent = True
+                except Exception as e:
+                    email_error = str(e)
+                    traceback.print_exc()
 
-            success_message = "تحقق من بريدك الإلكتروني لتفعيل الحساب." if current_language == 'ar' else "Check your email to activate your account."
+            if email and email_sent:
+                success_message = "تم إنشاء حسابك بنجاح! تحقق من بريدك الإلكتروني لتفعيل الحساب." if current_language == 'ar' else "Account created successfully! Check your email to activate your account."
+            elif email and not email_sent:
+                success_message = f"تم إنشاء حسابك ولكن فشل إرسال البريد الإلكتروني. الرجاء التواصل مع الدعم." if current_language == 'ar' else f"Account created but email failed to send. Please contact support. Error: {email_error}"
+            else:
+                success_message = "تم إنشاء حسابك بنجاح! لم يتم توفير بريد إلكتروني للتفعيل." if current_language == 'ar' else "Account created successfully! No email provided for activation."
             
             return render(
                 request,

@@ -255,7 +255,7 @@
         </div>
         {% endif %}
 
-        <form id="fitra-form" action="{% url 'members:register' %}" class="space-y-8" method="POST" enctype="multipart/form-data">
+        <form id="fitra-form" action="{% url 'members:register' %}" method="POST" enctype="multipart/form-data" class="space-y-8">
             {% csrf_token %}
 
                 {% if error_message %}
@@ -507,7 +507,7 @@
                     <p class="text-sm text-main-fitra mb-3 font-semibold">{% translate "You can choose more than one goal" %}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                         <div class="flex items-center">
-                            <input type="checkbox" id="goal-fatloss" name="fitness_goal" value="FAT LOSS" class="custom-checkbox-input" required {% if 'FAT LOSS' in form.fitness_goal.value %}checked{% endif %}>
+                            <input type="checkbox" id="goal-fatloss" name="fitness_goal" value="FAT LOSS" class="custom-checkbox-input" {% if 'FAT LOSS' in form.fitness_goal.value %}checked{% endif %}>
                             <label for="goal-fatloss" class="custom-label w-full">{% translate "Fat Loss" %}</label>
                         </div>
                         <div class="flex items-center">
@@ -742,7 +742,7 @@
         </form>
         
         <!-- Notification Message Box (Replaces alert()) -->
-        <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-main-fitra text-black p-4 rounded-lg shadow-xl hidden transition-opacity duration-300 z-50" role="alert">
+        <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-main-fitra text-black font-bold p-4 rounded-lg shadow-xl hidden transition-opacity duration-300 z-50 max-w-md text-center" role="alert">
             {% translate 'Form submitted successfully! Thank you.' %}
         </div>
 
@@ -750,6 +750,8 @@
 
     <script>
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Form script initialized');
+    
     const form = document.getElementById('fitra-form');
     const maleRadio = document.getElementById('gender-male');
     const femaleRadio = document.getElementById('gender-female');
@@ -760,6 +762,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearBtn = document.getElementById('clear-form-btn');
     const messageBox = document.getElementById('message-box');
     const phoneInput = document.getElementById('phone');
+
+    if (!form) {
+        console.error('Form not found!');
+        return;
+    }
+
+    console.log('All form elements found successfully');
 
     /* --------------------------------------------------------
        Toggle Gender Fields
@@ -898,55 +907,73 @@ document.addEventListener('DOMContentLoaded', () => {
        Form Validation + Submit
     -------------------------------------------------------- */
     form.addEventListener('submit', (event) => {
+        let hasError = false;
+        let errorMessage = '';
+
         const phoneNumber = phoneInput ? phoneInput.value.trim() : "";
 
         // Validate phone number
         if (phoneNumber && !phoneNumber.startsWith('01')) {
-            event.preventDefault();
-            messageBox.textContent = "{% translate 'Phone number must start with 01' %}";
-            messageBox.classList.remove('hidden');
+            hasError = true;
+            errorMessage = "{% translate 'Phone number must start with 01' %}";
             phoneInput.focus();
+        }
 
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 3000);
-
-            return; // stop submission
+        // Validate at least one fitness goal is selected
+        if (!hasError) {
+            const fitnessGoalCheckboxes = form.querySelectorAll('input[name="fitness_goal"]:checked');
+            if (fitnessGoalCheckboxes.length === 0) {
+                hasError = true;
+                errorMessage = "{% translate 'Please select at least one fitness goal.' %}";
+                const firstGoalCheckbox = form.querySelector('input[name="fitness_goal"]');
+                if (firstGoalCheckbox) {
+                    firstGoalCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
         }
 
         // Validate gender-specific fields
-        if (maleRadio.checked) {
-            const photos = malePhotosInput.files;
+        if (!hasError && maleRadio && maleRadio.checked) {
+            const photos = malePhotosInput ? malePhotosInput.files : null;
             if (!photos || photos.length === 0) {
-                event.preventDefault();
-                messageBox.textContent = "{% translate 'Please upload the required photos (4 photos)' %}";
-                messageBox.classList.remove('hidden');
-                malePhotosInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 3000);
-
-                return; // stop submission
+                hasError = true;
+                errorMessage = "{% translate 'Please upload the required photos (4 photos)' %}";
+                if (malePhotosInput) {
+                    malePhotosInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
-        } else if (femaleRadio.checked) {
-            const measurements = femaleMeasurementsInput.value.trim();
+        } else if (!hasError && femaleRadio && femaleRadio.checked) {
+            const measurements = femaleMeasurementsInput ? femaleMeasurementsInput.value.trim() : '';
             if (!measurements) {
-                event.preventDefault();
-                messageBox.textContent = "{% translate 'Please enter your measurements' %}";
-                messageBox.classList.remove('hidden');
-                femaleMeasurementsInput.focus();
-
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 3000);
-
-                return; // stop submission
+                hasError = true;
+                errorMessage = "{% translate 'Please enter your measurements' %}";
+                if (femaleMeasurementsInput) {
+                    femaleMeasurementsInput.focus();
+                }
             }
         }
 
+        // If validation fails, prevent submission and show error
+        if (hasError) {
+            event.preventDefault();
+            event.stopPropagation();
+            messageBox.textContent = errorMessage;
+            messageBox.classList.remove('hidden');
+            messageBox.classList.add('bg-red-600');
+            messageBox.classList.remove('bg-main-fitra');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+                messageBox.classList.remove('bg-red-600');
+                messageBox.classList.add('bg-main-fitra');
+            }, 5000);
+
+            return false;
+        }
+
         // If all validation passes, allow form to submit normally
-        // No need for event.preventDefault() here
+        // Don't prevent default, let the form submit
+        console.log('Form validation passed, submitting...');
     });
 });
 </script>
@@ -956,7 +983,18 @@ document.addEventListener('DOMContentLoaded', () => {
 </body>
  {% if success_message %}
         <script>
-            alert("{{ success_message }}");
+            document.addEventListener('DOMContentLoaded', () => {
+                const messageBox = document.getElementById('message-box');
+                if (messageBox) {
+                    messageBox.textContent = "{{ success_message }}";
+                    messageBox.classList.remove('hidden');
+                    messageBox.classList.add('bg-main-fitra');
+                    
+                    setTimeout(() => {
+                        messageBox.classList.add('hidden');
+                    }, 5000);
+                }
+            });
         </script>
     {% endif %}
 </html>
