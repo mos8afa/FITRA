@@ -58,7 +58,9 @@
     <header>
     <div class="container">
         <a href="" class="logo">
-            <img src="{{info.logo.url}}" alt="logo">
+            {% if info.logo %}
+                <img src="{{info.logo.url}}" alt="logo">
+            {% endif %}
         </a>
         <nav>
             <i class="fas fa-bars toggle-menu"></i>
@@ -114,7 +116,9 @@
             <div class="main animation-3d-container">
                 <div class="animated-card animation-3d-card">
                     <div class="goku animation-3d-goku">
-                        <img src="{{brief.brief_image.url}}" alt="Animated Person" class="animation-3d-img">
+                        {% if brief.brief_image %}
+                            <img src="{{brief.brief_image.url}}" alt="Animated Person" class="animation-3d-img">
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -135,7 +139,9 @@
                 <p>{{about_us.about_us_content|safe}}</p>
             </div>
             <div class="section">
-                <img src="{{about_us.about_us_image.url}}" alt="">
+                {% if about_us.about_us_image %}
+                    <img src="{{about_us.about_us_image.url}}" alt="">
+                {% endif %}
             </div>
             <div class="extra">
                 <div>
