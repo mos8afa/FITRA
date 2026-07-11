@@ -210,11 +210,12 @@
                             <a href="{% url 'members:register' %}">{% translate "Join Now" %}</a>
                         </span>
                         <ul>
-                        {% for advantage in pack.advantages.all  %}
-                            <li><i class="bi bi-check-lg"></i>{{advantage.advantages|safe}}</li>
-                        {% endfor %}    
-                        {% for disadvantage in pack.disadvantages.all %}
-                            <li><i class="fas fa-times red"></i>{{disadvantage.disadvantages|safe}}</li>
+                        {% for pf in pack.packadgefeature_set.all %}
+                            {% if pf.is_included %}
+                                <li><i class="bi bi-check-lg"></i>{{ pf.feature.text|safe }}</li>
+                            {% else %}
+                                <li><i class="fas fa-times red"></i>{{ pf.feature.text|safe }}</li>
+                            {% endif %}
                         {% endfor %}
                         </ul>
                     </div>

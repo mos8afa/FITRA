@@ -13,13 +13,9 @@ class InfoTranslationOptions(TranslationOptions):
 class AboutUsTranslationOptions(TranslationOptions):
     fields = ('about_us_content',) 
 
-@register(models.PackadgeAdvantage)
-class PackadgeAdvantageTranslationOptions(TranslationOptions):
-    fields = ('advantages',)
-
-@register(models.PackadgeDisadvantage)
-class PackadgeDisadvantageTranslationOptions(TranslationOptions):
-    fields = ('disadvantages',) 
+@register(models.Feature)
+class FeatureTranslationOptions(TranslationOptions):
+    fields = ('text',)
     
 @register(models.Packadges)
 class PackadgesTranslationOptions(TranslationOptions):

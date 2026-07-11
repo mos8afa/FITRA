@@ -34,22 +34,35 @@ class SuccessfullStories(models.Model):
     def __str__(self):
         return self.name
 
-class PackadgeAdvantage(models.Model):
-    advantages = models.TextField(verbose_name = 'Pack Advantages')
-    def __str__(self):
-        return self.advantages
+class Feature(models.Model):
+    text = models.TextField(verbose_name='Feature')
 
-class PackadgeDisadvantage(models.Model):
-    disadvantages = models.TextField(verbose_name = 'Pack Disadvantages')
     def __str__(self):
-        return self.disadvantages
+        return self.text
+
 
 class Packadges(models.Model):
-    name  = models.CharField(verbose_name = 'Packadge', max_length = 200)
-    before_price = models.DecimalField(max_digits = 10, decimal_places = 2)
-    after_price = models.DecimalField(max_digits = 10, decimal_places = 2)
-    time = models.CharField(verbose_name = 'Duration', max_length = 100)
-    image = models.ImageField(verbose_name ='Packadge Image', upload_to='settings/')
-    advantages = models.ManyToManyField(PackadgeAdvantage, blank = True, null = True, related_name = 'packadge_pros')
-    disadvantages = models.ManyToManyField(PackadgeDisadvantage, blank = True, null = True, related_name = 'packadge_cons')
+    name = models.CharField(verbose_name='Packadge', max_length=200)
+    before_price = models.DecimalField(max_digits=10, decimal_places=2)
+    after_price = models.DecimalField(max_digits=10, decimal_places=2)
+    time = models.CharField(verbose_name='Duration', max_length=100)
+    image = models.ImageField(verbose_name='Packadge Image', upload_to='settings/')
+    features = models.ManyToManyField(Feature, through='PackadgeFeature', related_name='packages')
+
+    def __str__(self):
+        return self.name
+
+
+class PackadgeFeature(models.Model):
+    package = models.ForeignKey(Packadges, on_delete=models.CASCADE)
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
+    is_included = models.BooleanField(default=True, verbose_name='Included in this package?')
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
+
+    class Meta:
+        unique_together = ('package', 'feature')
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.package.name} — {self.feature.text} ({'✓' if self.is_included else '✗'})"
 
