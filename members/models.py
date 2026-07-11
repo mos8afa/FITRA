@@ -185,3 +185,24 @@ class HearAboutUs(models.Model):
         return f"{self.member.name} - {self.source}"
 
 
+class PendingRegistration(models.Model):
+    email = models.EmailField(db_index=True) 
+    preferred_language = models.CharField(max_length=5, default='en')
+    form_data = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pending: {self.email} ({self.created_at:%Y-%m-%d %H:%M})"
+
+
+class PendingPicture(models.Model):
+    pending_registration = models.ForeignKey(
+        PendingRegistration,
+        on_delete=models.CASCADE,
+        related_name='pending_pictures',
+    )
+    image = models.ImageField(upload_to='pending/')
+
+    def __str__(self):
+        return f"PendingPicture for PendingRegistration #{self.pending_registration_id}"
+
