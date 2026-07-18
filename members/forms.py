@@ -101,7 +101,7 @@ class RegistrationForm(forms.Form):
         }
     )
     email = forms.EmailField(
-        required=False,
+        required=True,
         error_messages={
             'invalid': _('Please enter a valid email address.')
         }

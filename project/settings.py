@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'members',
     'django_summernote',
-    'widget_tweaks',
     'solo',
     'adminsortable2',
 ]

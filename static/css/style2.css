@@ -1,35 +1,3 @@
-/* === RTL FIX for Successful Stories Section === */
-html[lang="ar"] .stories-carousel {
-    direction: rtl;
-}
-
-/* ترتيب الأسهم في RTL */
-html[lang="ar"] .stories-carousel.owl-carousel .owl-nav .owl-prev {
-    right: -60px;
-    left: auto;
-}
-html[lang="ar"] .stories-carousel.owl-carousel .owl-nav .owl-next {
-    left: -60px;
-    right: auto;
-}
-
-/* عكس اتجاه المقارنة بين الصور */
-html[lang="ar"] .story-photo-comparison .img-after-container {
-    left: auto;
-    right: 0;
-}
-
-html[lang="ar"] .story-photo-comparison .divider-handle {
-    left: auto;
-    right: calc(50% - 3px);
-}
-
-html[lang="ar"] .story-transformation-card {
-    direction: rtl;
-}
-
-
-
 /* تنسيق الإعلان (المودال) */
 #overlay 
 {
@@ -942,48 +910,8 @@ aside .container .plans .card:nth-child(1) div:hover
     background-color: rgb(27, 124, 198);
 }
 
-.card:nth-child(1) div:hover::after
-{
-    z-index: -1;
-    content: "";
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.3;
-    position: absolute;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-image: url(../img/P1.png);
-    transition: background-position 0.5s ease;
-}
-
-aside .container .plans .card:nth-child(2) div:hover
-{
-    background-color: rgb(138, 51, 196);
-}
-
-.card:nth-child(2) div:hover::after
-{
-    z-index: -1;
-    content: "";
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.3;
-    position: absolute;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-image: url(../img/P2.png);
-    transition: background-position 0.5s ease;
-}
-
-aside .container .plans .card:nth-child(3) div:hover
-{
-    background-color: rgb(180, 129, 28);
-}
-
+.card:nth-child(1) div:hover::after,
+.card:nth-child(2) div:hover::after,
 .card:nth-child(3) div:hover::after
 {
     z-index: -1;
@@ -996,8 +924,18 @@ aside .container .plans .card:nth-child(3) div:hover
     position: absolute;
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-image: url(../img/P3.png);
+    background-image: var(--hover-img);
     transition: background-position 0.5s ease;
+}
+
+aside .container .plans .card:nth-child(2) div:hover
+{
+    background-color: rgb(138, 51, 196);
+}
+
+aside .container .plans .card:nth-child(3) div:hover
+{
+    background-color: rgb(180, 129, 28);
 }
 
 aside .container .plans .card div *

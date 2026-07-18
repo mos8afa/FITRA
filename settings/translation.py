@@ -17,10 +17,6 @@ class AboutUsTranslationOptions(TranslationOptions):
 class FeatureTranslationOptions(TranslationOptions):
     fields = ('text',)
     
-@register(models.Packadges)
-class PackadgesTranslationOptions(TranslationOptions):
+@register(models.Packages)
+class PackagesTranslationOptions(TranslationOptions):
     fields = ('name','time',)
-
-@register(models.Footer)
-class FooterTranslationOptions(TranslationOptions):
-    fields = ('footer_slogan',)

@@ -1,17 +1,9 @@
-{% load static %}
-{% load i18n %}
+{% extends "base.html" %}
+{% load static i18n %}
 
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+{% block title %}FITRA | Online Coaching{% endblock %}
 
-{% load i18n static %}
-{% get_current_language as LANGUAGE_CODE %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FITRA | Online Coaching</title>
-    <link rel="icon" type="image/png" href="{% static 'img/logo-H.png' %}">
-
+{% block extra_head %}
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
     <link rel="stylesheet" href="{% static 'css/animations.css' %}">
@@ -22,90 +14,68 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% endif %}
 
-    <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- English Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Merienda:wght@300..900&family=Permanent+Marker&display=swap" rel="stylesheet">
-
-    <!-- Arabic Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
-    
-    <!-- Owl Carousel -->
+
     <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
-</head>
+{% endblock %}
 
-
-<body>
-    
-    <!-- عنصر الخلفية الضبابية -->
+{% block content %}
     <div id="overlay"></div>
-    <!-- عنصر الإعلان المخفي -->
-    <!-- <div id="ad">
-        <span id="close-btn">X</span>
-        <a href="../Perfume Website/index.html" target="_blank">
-            <img src="img/ad.png" alt="ad">
-        </a>
-    </div> -->
 
     <header>
-    <div class="container">
-        <a href="" class="logo">
-            {% if info.logo %}
-                <img src="{{info.logo.url}}" alt="logo">
-            {% endif %}
-        </a>
-        <nav>
-            <i class="fas fa-bars toggle-menu"></i>
-            <ul>
-                <li><a href="/">{% translate "Home" %}</a></li>
-                <li><a href="#Packages">{% translate "Packages" %} <i class="bi bi-cart3"></i></a></li>
-                <li><a href="#Contact">{% translate "Contact US" %}</a></li>
-                <li><a class="active" href="{% url 'members:register' %}">{% translate "Become a Member" %}</a></li>
-
-                {% get_current_language as LANGUAGE_CODE %}
-
-                {% if LANGUAGE_CODE == "en" %}
-                    <li>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('lang-ar').submit();">
-                            العربية
-                        </a>
-                        <form id="lang-ar" action="{% url 'set_language' %}" method="post" style="display:none;">
-                            {% csrf_token %}
-                            <input type="hidden" name="language" value="ar">
-                            <input type="hidden" name="next" value="{{ request.path }}">
-                        </form>
-                    </li>
-                {% elif LANGUAGE_CODE == "ar" %}
-                    <li>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('lang-en').submit();">
-                            English
-                        </a>
-                        <form id="lang-en" action="{% url 'set_language' %}" method="post" style="display:none;">
-                            {% csrf_token %}
-                            <input type="hidden" name="language" value="en">
-                            <input type="hidden" name="next" value="{{ request.path }}">
-                        </form>
-                    </li>
+        <div class="container">
+            <a href="" class="logo">
+                {% if info.logo %}
+                    <img src="{{info.logo.url}}" alt="logo">
                 {% endif %}
-            </ul>
-        </nav>
-    </div>
-</header>
+            </a>
+            <nav>
+                <i class="fas fa-bars toggle-menu"></i>
+                <ul>
+                    <li><a href="/">{% translate "Home" %}</a></li>
+                    <li><a href="#Packages">{% translate "Packages" %} <i class="bi bi-cart3"></i></a></li>
+                    <li><a href="#Contact">{% translate "Contact US" %}</a></li>
+                    <li><a class="active" href="{% url 'members:register' %}">{% translate "Become a Member" %}</a></li>
 
+                    {% get_current_language as LANGUAGE_CODE %}
 
+                    {% if LANGUAGE_CODE == "en" %}
+                        <li>
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('lang-ar').submit();">
+                                العربية
+                            </a>
+                            <form id="lang-ar" action="{% url 'set_language' %}" method="post" style="display:none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="language" value="ar">
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                            </form>
+                        </li>
+                    {% elif LANGUAGE_CODE == "ar" %}
+                        <li>
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('lang-en').submit();">
+                                English
+                            </a>
+                            <form id="lang-en" action="{% url 'set_language' %}" method="post" style="display:none;">
+                                {% csrf_token %}
+                                <input type="hidden" name="language" value="en">
+                                <input type="hidden" name="next" value="{{ request.path }}">
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <div class="landing">
-        <div class="overlay">
-
-        </div>
+        <div class="overlay"></div>
         <div class="content">
             <h2>{{info.slogan}}</h2>
         </div>
@@ -173,8 +143,8 @@
             <div class="arrow">
                 <i class="fas fa-angle-down fa-2x"></i>
             </div>
-            
-            <!-- New Successful Stories Section -->
+
+            <!-- Successful Stories Section -->
             <div class="success-stories">
                 <div class="stories-header">
                     <h2>{% translate "Successful Stories" %}</h2>
@@ -203,9 +173,9 @@
             <h1 id="Packages">{% translate "Our Plans" %}</h1>
             <h2>{% translate "CHOOSE YOUR PLAN" %}</h2>
             <div class="plans">
-            {% for pack in packadges %}
+            {% for pack in packages %}
                 <div class="card">
-                    <div>
+                    <div style="--hover-img: url('{{ pack.image.url }}')">
                         <h1>{{pack.name}}</h1>
                         <article>
                             <del>{{pack.before_price}}LE</del>
@@ -216,7 +186,7 @@
                             <a href="{% url 'members:register' %}">{% translate "Join Now" %}</a>
                         </span>
                         <ul>
-                        {% for pf in pack.packadgefeature_set.all %}
+                        {% for pf in pack.packagefeature_set.all %}
                             {% if pf.is_included %}
                                 <li><i class="bi bi-check-lg"></i>{{ pf.feature.text|safe }}</li>
                             {% else %}
@@ -227,7 +197,7 @@
                     </div>
                 </div>
             {% endfor %}
-            </div> 
+            </div>
         </div>
     </aside>
 
@@ -235,9 +205,9 @@
         <canvas id="glow-bg"></canvas>
         <div class="container fade-in">
             <q>
-                {{footer_slogan}} 
-                <span class="broken" data-text="BROKEN"><span>{{broken_word}}</span></span>
-                {{footer_slogan_2}}
+                Even a glow stick needs to be
+                <span class="broken" data-text="BROKEN"><span>BROKEN</span></span>
+                to light !
             </q>
         </div>
     </div>
@@ -251,128 +221,73 @@
             {% if LANGUAGE_CODE == 'ar' %}
             <div class="footer_2 fade-in">
                 <h3 class="dynamic-word">
-                    <span>ا</span>
-                    <span>ن</span>
-                    <span>و</span>
-                    <span>ر</span>
-                    <span>و</span>
-                    <span>ز</span>
+                    <span>ا</span><span>ن</span><span>و</span><span>ر</span><span>و</span><span>ز</span>
             {% else %}
             <div class="footer_2 fade-in">
-                <h3 class="dynamic-word" >
-                    <span>C</span>
-                    <span>O</span>
-                    <span>N</span>
-                    <span>N</span>
-                    <span>E</span>
-                    <span>C</span>
-                    <span>T</span>
-                    <span>I</span>
-                    <span>O</span>
-                    <span>N</span>
+                <h3 class="dynamic-word">
+                    <span>C</span><span>O</span><span>N</span><span>N</span><span>E</span><span>C</span><span>T</span><span>I</span><span>O</span><span>N</span>
             {% endif %}
-            
                 </h3>
-                
 
-                <!-- <i class="bi bi-arrow-bar-down"></i> -->
                 <div class="rack">
-                    <!-- الدعم الخلفي -->
                     <div class="support_1"></div>
                     <div class="support_2"></div>
-                    <!-- القاعدة الأرضية -->
                     <div class="base"></div>
 
-                    <!-- بار أول -->
                     <div class="bar bar-1">
-                        <a href="{{social_links.youtube}}" class="holder youtube">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                        <a href="{{social_links.facebook}}" class="holder facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
+                        <a href="{{social_links.youtube}}" class="holder youtube"><i class="fab fa-youtube"></i></a>
+                        <a href="{{social_links.facebook}}" class="holder facebook"><i class="fab fa-facebook-f"></i></a>
                     </div>
-                    <!-- بار ثاني -->
                     <div class="bar bar-2">
-                        <a href="{{social_links.whatsapp}}" class="holder whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                        <a href="{{social_links.instagram}}" class="holder instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
+                        <a href="{{social_links.whatsapp}}" class="holder whatsapp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="{{social_links.instagram}}" class="holder instagram"><i class="fab fa-instagram"></i></a>
                     </div>
-                    <!-- بار ثالث -->
                     <div class="bar bar-3">
-                        <a href="{{social_links.telegram}}" class="holder telegram">
-                            <i class="fab fa-telegram-plane"></i>
-                        </a>
-                        <a href="{{social_links.tiktok}}" class="holder tiktok">
-                            <i class="fab fa-tiktok"></i>
-                        </a>
+                        <a href="{{social_links.telegram}}" class="holder telegram"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="{{social_links.tiktok}}" class="holder tiktok"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
             </div>
-
         </div>
-        <!-- <hr> -->
         <p class="farouk">
-            Copyright © 2025 All rights reserved | Made by  
-            <span class="frontend">
-                Front-End:
-                <a href="https://t.me/Roka_31"> Farouk</a>
-            </span> 
-            & 
+            Copyright © 2025 All rights reserved | Made by
+            <span class="frontend">Front-End: <a href="https://t.me/Roka_31"> Farouk</a></span>
+            &amp;
             Back-End:
-            <span class="backend">
-                <a href="https://t.me/mostafarrashwan"> Mostafa</a>
-            </span>
+            <span class="backend"><a href="https://t.me/mostafarrashwan"> Mostafa</a></span>
         </p>
-
     </footer>
+{% endblock %}
 
-
-</body>
-<!-- Owl Carousel JS -->
-    <script src="{% static 'js/jquery.min.js' %}"></script> 
+{% block extra_scripts %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
     <script src="{% static 'js/jquery-migrate-3.0.1.min.js' %}"></script>
-
     <script src="{% static 'js/1.js' %}"></script>
     <script src="{% static 'js/animations.js' %}"></script>
     <script src="{% static 'js/instagram-api.js' %}"></script>
     <script>
-        // Successful Stories Carousel
-            $(document).ready(function() {
+        $(document).ready(function() {
             $('.stories-carousel').owlCarousel({
-            center: false, 
-            loop: true,
-            items: 1,
-            margin: 30,
-            stagePadding: 14,
-            nav: true, 
-            // ***************************************************************
-            autoplay: false,
-            autoplayTimeout: 2000, // المدة التي تريدها بين الكروت (2.5 ثواني كمثال)
-            autoplayHoverPause: true,
-            // ***************************************************************
-            navText: [
-            '<i class="fas fa-angle-left fa-2x"></i>', 
-            '<i class="fas fa-angle-right fa-2x"></i>'
-            ], 
-        
+                center: false,
+                loop: true,
+                items: 1,
+                margin: 30,
+                stagePadding: 14,
+                nav: true,
+                autoplay: false,
+                autoplayTimeout: 2000,
+                autoplayHoverPause: true,
+                navText: [
+                    '<i class="fas fa-angle-left fa-2x"></i>',
+                    '<i class="fas fa-angle-right fa-2x"></i>'
+                ],
                 responsive: {
-                0: { 
-                    items: 1
-                },
-                650: { 
-                    items: 2
-                },
-                992: { 
-                    items: 3
-                },
-                1200: {
-                    items: 4
-               } }
+                    0: { items: 1 },
+                    650: { items: 2 },
+                    992: { items: 3 },
+                    1200: { items: 4 }
+                }
             });
         });
     </script>
@@ -380,6 +295,5 @@
     <script>
         alert("{{ alert_message }}");
     </script>
-{% endif %}
-
-</html>
+    {% endif %}
+{% endblock %}

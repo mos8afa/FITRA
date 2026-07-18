@@ -14,10 +14,6 @@ class AboutUs(SingletonModel):
     about_us_content =  models.TextField(verbose_name ='About Us')
     about_us_image = models.ImageField(verbose_name ='About US Image', upload_to='settings/')
 
-class Footer(SingletonModel):
-    footer_slogan = models.CharField(verbose_name ='Footer Slogan', max_length = 200 )
-    footer_image = models.ImageField(verbose_name = 'Footer Image', upload_to ='settings/')
-
 class SocialLinks(SingletonModel):
     youtube = models.URLField(verbose_name ='Youtube Link', max_length = 100, blank=True)  
     whatsapp = models.URLField(verbose_name ='Whatsapp Link', max_length = 100, blank=True)   
@@ -41,20 +37,20 @@ class Feature(models.Model):
         return self.text
 
 
-class Packadges(models.Model):
-    name = models.CharField(verbose_name='Packadge', max_length=200)
+class Packages(models.Model):
+    name = models.CharField(verbose_name='Package', max_length=200)
     before_price = models.DecimalField(max_digits=10, decimal_places=2)
     after_price = models.DecimalField(max_digits=10, decimal_places=2)
     time = models.CharField(verbose_name='Duration', max_length=100)
-    image = models.ImageField(verbose_name='Packadge Image', upload_to='settings/')
-    features = models.ManyToManyField(Feature, through='PackadgeFeature', related_name='packages')
+    image = models.ImageField(verbose_name='Package Image', upload_to='settings/')
+    features = models.ManyToManyField(Feature, through='PackageFeature', related_name='packages')
 
     def __str__(self):
         return self.name
 
 
-class PackadgeFeature(models.Model):
-    package = models.ForeignKey(Packadges, on_delete=models.CASCADE)
+class PackageFeature(models.Model):
+    package = models.ForeignKey(Packages, on_delete=models.CASCADE)
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
     is_included = models.BooleanField(default=True, verbose_name='Included in this package?')
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
