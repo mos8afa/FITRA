@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
+from datetime import timedelta
 
 
 
@@ -33,6 +34,17 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
 INSTALLED_APPS = [
     'modeltranslation',
     'settings',
@@ -46,6 +58,8 @@ INSTALLED_APPS = [
     'django_summernote',
     'solo',
     'adminsortable2',
+    'APIs',
+    "rest_framework",
 ]
 
 MIDDLEWARE = [

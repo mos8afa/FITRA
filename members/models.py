@@ -1,7 +1,7 @@
 from django.db import models
 import datetime
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.auth.models import User
 
 GENDER = [
     ('MALE','Male'),
@@ -129,6 +129,12 @@ class Governorate(models.Model):
 
 
 class Member(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
     join_date = models.DateField(verbose_name=_('Join Date'), auto_now_add=True)
     name = models.CharField(verbose_name=_('Name'), max_length=60)
     age = models.PositiveSmallIntegerField(verbose_name=_('Age'))
@@ -157,6 +163,7 @@ class Member(models.Model):
     confidence = models.CharField(verbose_name=_('Confidence'), max_length=10, choices=CONFIDENCE)
     comeback = models.CharField(verbose_name=_('Comeback'), max_length=10, choices=COMEBACK)
     is_activated = models.BooleanField(verbose_name=('IS Activated'), default=False)
+    trainee_code = models.CharField(null=True, blank=True)
     preferred_language = models.CharField(verbose_name=_('Preferred Language'), max_length=5, default='en', choices=[('en', 'English'), ('ar', 'Arabic')])
     def __str__(self):
         return self.name
