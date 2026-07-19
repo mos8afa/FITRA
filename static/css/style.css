@@ -937,6 +937,7 @@ aside .container .plans .card div h1
     font-size: 25px;
     margin-top: 10px;
     font-weight: 900;
+    transform: skewY(4deg);
 }   
 
 aside .container .plans .card div article
@@ -944,7 +945,7 @@ aside .container .plans .card div article
     display: flex;
     align-items: center;
     margin-right: 65px;
-    transform: rotate(0deg);
+    transform: skewY(4deg);
 }
 
 aside .container .plans .card div article h3
@@ -968,6 +969,7 @@ aside .container .plans .card div p
     font-size: 23px;
     font-weight: 700;
     margin: 0px 0px 35px;
+    transform: skewY(4deg);
 }
 
 aside .container .plans .card div a
@@ -986,6 +988,7 @@ aside .container .plans .card .btn {
   position: relative;
   height: 43px;
   top: 12px;
+  transform: skewY(4deg);
 }
 aside .container .plans .card:hover .btn {
   width: 106px;
@@ -1070,7 +1073,7 @@ aside .container .plans .card div ul
     list-style: none;
     margin-top: 35px;
     padding: 0px 20px;
-    transform: skew(0deg);
+    transform: skewY(4deg);
 }
 
 aside .container .plans .card div ul li
